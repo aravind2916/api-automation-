@@ -1,0 +1,133 @@
+[
+  {
+    "description": "Create group with valid name and description",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "test-Aravind1reeee",
+      "name": "test345ff"
+    },
+    "expected_status": 201,
+    "validate_response_keys": ["status", "message", "group"],
+    "expected_message": "Group created successfully.",
+    "check_performance": true,
+    "max_duration": 2
+  },
+  {
+    "description": "Create group without name - should fail",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "missing name"
+    },
+    "expected_status_list": [400, 422],
+    "expected_failure": true
+  },
+  {
+    "description": "Create group with empty description - should fail",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "",
+      "name": "test_empty_desc"
+    },
+    "expected_status_list": [400, 422],
+    "expected_failure": true
+  },
+  {
+    "description": "Create group with name containing only spaces - should fail",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "invalid group",
+      "name": "   "
+    },
+    "expected_status_list": [400, 422],
+    "expected_failure": true
+  },
+  {
+    "description": "Create group with duplicate name - should fail",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "duplicate test",
+      "name": "test345"
+    },
+    "expected_status_list": [400, 409],
+    "expected_failure": true
+  },
+  {
+  "description": "Create group with very long name (edge case)",
+  "endpoint": "/group/{email}/thinxfresh/group",
+  "method": "POST",
+  "payload": {
+    "description": "testing with large name field",
+    "name": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "expected_status_list": [400, 422],
+  "expected_failure": true
+}
+,
+  {
+    "description": "Create group with special characters in name",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "special chars test",
+      "name": "Test@#$%"
+    },
+    "expected_status": 201
+  },
+  {
+    "description": "Create group with numeric-only name",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "numeric test",
+      "name": "123456"
+    },
+    "expected_status": 201
+  },
+  {
+    "description": "Create group without authorization - should return 401",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "auth_type": "none",
+    "payload": {
+      "description": "unauthorized test",
+      "name": "unauth1"
+    },
+    "expected_status": 401
+  },
+  {
+    "description": "Create group with invalid token - should return 403/401",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "auth_type": "invalid",
+    "payload": {
+      "description": "invalid token test",
+      "name": "invalidAuth"
+    },
+    "expected_status_list": [401, 403]
+  },
+  {
+    "description": "Create group with invalid JSON payload - malformed body",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "raw_body": "{'invalid': True}", 
+    "expected_status_list": [400, 422],
+    "expected_failure": true
+  },
+  {
+    "description": "Measure group creation performance under normal load",
+    "endpoint": "/group/{email}/thinxfresh/group",
+    "method": "POST",
+    "payload": {
+      "description": "performance test",
+      "name": "test_perf"
+    },
+    "expected_status": 201,
+    "check_performance": true,
+    "max_duration": 1.5
+  }
+]

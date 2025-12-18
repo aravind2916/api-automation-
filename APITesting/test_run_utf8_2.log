@@ -1,0 +1,216 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.0.1, pluggy-1.6.0 -- C:\Users\AravindMaddineni\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.9', 'Platform': 'Windows-11-10.0.26200-SP0', 'Packages': {'pytest': '9.0.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'metadata': '3.1.1'}}
+rootdir: C:\Users\AravindMaddineni\Downloads\Apitest2 1\APITesting\APITesting
+configfile: pytest.ini
+plugins: html-4.1.1, metadata-3.1.1
+collecting ... collected 31 items
+
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_update_password_change_to_123] FAILED
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_min_length_8chars] FAILED
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_max_length_20chars] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_mixed_complexity] FAILED
+tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch_case] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch_trailing_space] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_new_password] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_confirm_password] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[empty_payload] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[empty_strings] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[null_values] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[short_password_1char] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[short_password_7chars] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[long_password_excessive] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_upper_case] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_lower_case] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_digit] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_special_char] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[only_whitespace] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[leading_whitespace] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[trailing_whitespace] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[same_as_old_password] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[int_as_string_type_error] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[bool_as_string_type_error] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[sql_injection_attempt] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[xss_injection_attempt] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[unicode_characters] FAILED
+tests/test_update_password_ddt.py::test_update_password_ddt[emoji_characters] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[control_characters] PASSED
+tests/test_update_password_ddt.py::test_update_password_ddt[no_auth_header] PASSED
+
+================================== FAILURES ===================================
+________ test_update_password_ddt[valid_update_password_change_to_123] ________
+
+case = {'expected_status': 200, 'name': 'valid_update_password_change_to_123', 'payload': {'confirmPassword': 'Aravind@123', 'newPassword': 'Aravind@123'}}
+auth_token = '{"access": "prC1CUlGbx5lbt/U2qRreTdVMRWhLKNfJMSsd1u6/ilhtC8qVwMAnnlLbWH2v8gLVBMPcCRTP834G4kzfcAZFIsKe2f7fSYcwsExJ/3Dj...fZ00OuVcSG65bg9L9mom+6zaszR1Y7Zo75FxgOjO0LgTxbnVY18Qp+vRvKjFwre2O78yizmmIRU+2z6ZTL/N0uR7Kc1bJXvvheJIVP6AUeM53YRYug=="}'
+
+    @pytest.mark.parametrize("case", DDT_CASES, ids=[c["name"] for c in DDT_CASES])
+    def test_update_password_ddt(case, auth_token):
+    
+        payload = case.get("payload")
+        include_auth = case.get("include_auth", True)
+        expected_status = case["expected_status"]
+    
+        headers = {"Content-Type": "application/json"}
+    
+        if include_auth:
+            # Use auth_token fixture
+            headers["Authorization"] = f"Bearer {auth_token}"
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+        else:
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+    
+>       assert response.status_code == expected_status, (
+            f"[{case['name']}] Expected {expected_status}, "
+            f"got {response.status_code}. Response: {response.text}"
+        )
+E       AssertionError: [valid_update_password_change_to_123] Expected 200, got 400. Response: {"message":"New password cannot be the same as old password"}
+E       assert 400 == 200
+E        +  where 400 = <Response [400]>.status_code
+
+tests\test_update_password_ddt.py:49: AssertionError
+______________ test_update_password_ddt[valid_min_length_8chars] ______________
+
+case = {'expected_status': 200, 'name': 'valid_min_length_8chars', 'payload': {'confirmPassword': 'Valid1@!', 'newPassword': 'Valid1@!'}}
+auth_token = '{"access": "prC1CUlGbx5lbt/U2qRreTdVMRWhLKNfJMSsd1u6/ilhtC8qVwMAnnlLbWH2v8gLVBMPcCRTP834G4kzfcAZFIsKe2f7fSYcwsExJ/3Dj...fZ00OuVcSG65bg9L9mom+6zaszR1Y7Zo75FxgOjO0LgTxbnVY18Qp+vRvKjFwre2O78yizmmIRU+2z6ZTL/N0uR7Kc1bJXvvheJIVP6AUeM53YRYug=="}'
+
+    @pytest.mark.parametrize("case", DDT_CASES, ids=[c["name"] for c in DDT_CASES])
+    def test_update_password_ddt(case, auth_token):
+    
+        payload = case.get("payload")
+        include_auth = case.get("include_auth", True)
+        expected_status = case["expected_status"]
+    
+        headers = {"Content-Type": "application/json"}
+    
+        if include_auth:
+            # Use auth_token fixture
+            headers["Authorization"] = f"Bearer {auth_token}"
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+        else:
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+    
+>       assert response.status_code == expected_status, (
+            f"[{case['name']}] Expected {expected_status}, "
+            f"got {response.status_code}. Response: {response.text}"
+        )
+E       AssertionError: [valid_min_length_8chars] Expected 200, got 400. Response: {"message":"Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one number, and one special character"}
+E       assert 400 == 200
+E        +  where 400 = <Response [400]>.status_code
+
+tests\test_update_password_ddt.py:49: AssertionError
+______________ test_update_password_ddt[valid_mixed_complexity] _______________
+
+case = {'expected_status': 200, 'name': 'valid_mixed_complexity', 'payload': {'confirmPassword': 'C0mpl3x!Password', 'newPassword': 'C0mpl3x!Password'}}
+auth_token = '{"access": "prC1CUlGbx5lbt/U2qRreTdVMRWhLKNfJMSsd1u6/ilhtC8qVwMAnnlLbWH2v8gLVBMPcCRTP834G4kzfcAZFIsKe2f7fSYcwsExJ/3Dj...fZ00OuVcSG65bg9L9mom+6zaszR1Y7Zo75FxgOjO0LgTxbnVY18Qp+vRvKjFwre2O78yizmmIRU+2z6ZTL/N0uR7Kc1bJXvvheJIVP6AUeM53YRYug=="}'
+
+    @pytest.mark.parametrize("case", DDT_CASES, ids=[c["name"] for c in DDT_CASES])
+    def test_update_password_ddt(case, auth_token):
+    
+        payload = case.get("payload")
+        include_auth = case.get("include_auth", True)
+        expected_status = case["expected_status"]
+    
+        headers = {"Content-Type": "application/json"}
+    
+        if include_auth:
+            # Use auth_token fixture
+            headers["Authorization"] = f"Bearer {auth_token}"
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+        else:
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+    
+>       assert response.status_code == expected_status, (
+            f"[{case['name']}] Expected {expected_status}, "
+            f"got {response.status_code}. Response: {response.text}"
+        )
+E       AssertionError: [valid_mixed_complexity] Expected 200, got 400. Response: {"message":"Password must be at least 8 characters long and include at least one lowercase letter, one uppercase letter, one number, and one special character"}
+E       assert 400 == 200
+E        +  where 400 = <Response [400]>.status_code
+
+tests\test_update_password_ddt.py:49: AssertionError
+________________ test_update_password_ddt[unicode_characters] _________________
+
+case = {'expected_status': 400, 'name': 'unicode_characters', 'payload': {'confirmPassword': 'P@ssw°rd123', 'newPassword': 'P@ssw°rd123'}}
+auth_token = '{"access": "prC1CUlGbx5lbt/U2qRreTdVMRWhLKNfJMSsd1u6/ilhtC8qVwMAnnlLbWH2v8gLVBMPcCRTP834G4kzfcAZFIsKe2f7fSYcwsExJ/3Dj...fZ00OuVcSG65bg9L9mom+6zaszR1Y7Zo75FxgOjO0LgTxbnVY18Qp+vRvKjFwre2O78yizmmIRU+2z6ZTL/N0uR7Kc1bJXvvheJIVP6AUeM53YRYug=="}'
+
+    @pytest.mark.parametrize("case", DDT_CASES, ids=[c["name"] for c in DDT_CASES])
+    def test_update_password_ddt(case, auth_token):
+    
+        payload = case.get("payload")
+        include_auth = case.get("include_auth", True)
+        expected_status = case["expected_status"]
+    
+        headers = {"Content-Type": "application/json"}
+    
+        if include_auth:
+            # Use auth_token fixture
+            headers["Authorization"] = f"Bearer {auth_token}"
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+        else:
+            response = requests.put(
+                UPDATE_PASSWORD_URL,
+                headers=headers,
+                json=payload,
+                verify=False,
+                timeout=20,
+            )
+    
+>       assert response.status_code == expected_status, (
+            f"[{case['name']}] Expected {expected_status}, "
+            f"got {response.status_code}. Response: {response.text}"
+        )
+E       AssertionError: [unicode_characters] Expected 400, got 200. Response: {"message":"Password updated successfully"}
+E       assert 200 == 400
+E        +  where 200 = <Response [200]>.status_code
+
+tests\test_update_password_ddt.py:49: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_update_password_ddt.py::test_update_password_ddt[valid_update_password_change_to_123]
+FAILED tests/test_update_password_ddt.py::test_update_password_ddt[valid_min_length_8chars]
+FAILED tests/test_update_password_ddt.py::test_update_password_ddt[valid_mixed_complexity]
+FAILED tests/test_update_password_ddt.py::test_update_password_ddt[unicode_characters]
+======================== 4 failed, 27 passed in 6.40s =========================

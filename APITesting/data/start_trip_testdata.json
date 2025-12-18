@@ -1,0 +1,141 @@
+[
+  {
+    "name": "valid_trip",
+    "description": "Valid trip start with all required fields",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": 1764739291,
+      "device_id": "ARAVIND"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expected_message": "Trip is starting."
+  },
+  {
+    "name": "missing_trip_name",
+    "description": "Missing trip_name field",
+    "payload": {
+      "start_time": 1764739291,
+      "device_id": "ARAVIND"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "missing_device_id",
+    "description": "Missing device_id field",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": 1764739291
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "invalid_start_time_type",
+    "description": "start_time is not an integer",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": "not_a_timestamp",
+      "device_id": "ARAVIND"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "missing_authorization",
+    "description": "No Authorization header sent",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": 1764739291,
+      "device_id": "ARAVIND"
+    },
+    "include_auth": false,
+    "expected_status": 401
+  },
+  {
+    "name": "empty_trip_name",
+    "description": "trip_name is empty string",
+    "payload": {
+      "trip_name": "",
+      "start_time": 1764739291,
+      "device_id": "ARAVIND"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "very_long_trip_name",
+    "description": "trip_name exceeds typical length limit",
+    "payload": {
+      "trip_name": "rgsuperlongtripnametest______________________________________________________1234567890",
+      "start_time": 1764739291,
+      "device_id": "ARAVIND"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "unknown_device_id",
+    "description": "device_id not registered / not mapped to user",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": 1764739291,
+      "device_id": "UNKNOWN_DEVICE_999"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "past_start_time",
+    "description": "start_time is far in the past",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": 1600000000,
+      "device_id": "ARAVIND"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "null_start_time",
+    "description": "start_time is null",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": null,
+      "device_id": "ARAVIND"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "extra_field_in_payload",
+    "description": "Payload contains extra unused field; API should ignore or handle gracefully",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": 1764739291,
+      "device_id": "ARAVIND",
+      "extra_param": "test"
+    },
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "device_id_lowercase",
+    "description": "Check if device_id is case-sensitive or not",
+    "payload": {
+      "trip_name": "rg",
+      "start_time": 1764739291,
+      "device_id": "aravind"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "missing_body",
+    "description": "No JSON body sent at all",
+    "payload": {},
+    "include_auth": true,
+    "expected_status": 400
+  }
+]

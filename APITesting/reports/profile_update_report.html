@@ -1,0 +1,2761 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinxFresh API Report</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-body: #020c1b;
+            --bg-sidebar: #112240;
+            --bg-card: #112240;
+            --bg-card-hover: #1d3557;
+
+            --text-primary: #ccd6f6;
+            --text-secondary: #8892b0;
+            --text-accent: #64ffda;
+
+            --border-color: #233554;
+
+            --success: #10b981;
+            --error: #ef4444;
+            --warning: #f59e0b;
+
+            --font-main: 'Inter', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--bg-sidebar);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand h1 {
+            color: var(--text-accent);
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .brand .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .nav-stats {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-badge .val {
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-badge .lbl {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .stat-badge.fail .val {
+            color: var(--error);
+        }
+
+        .stat-badge.pass .val {
+            color: var(--success);
+        }
+
+        .search-box {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-input {
+            width: 100%;
+            background: #020c1b;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-family: var(--font-main);
+        }
+
+        .search-input:focus {
+            border-color: var(--text-accent);
+            outline: none;
+        }
+
+        .chapter-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .chapter-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            transition: background 0.2s;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .chapter-item.active {
+            background-color: rgba(100, 255, 218, 0.05);
+            border-left-color: var(--text-accent);
+            color: var(--text-primary);
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot-passed {
+            background-color: var(--success);
+        }
+
+        .dot-failed {
+            background-color: var(--error);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            scrollbar-width: thin;
+        }
+
+        .page-container {
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .page-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-section h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--text-primary);
+        }
+
+        .meta-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-family: var(--font-code);
+        }
+
+        /* --- Cards & Tables --- */
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 6px;
+            padding: 0;
+            /* Padding handled by internal elements */
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background-color: rgba(255, 255, 255, 0.02);
+            padding: 15px 25px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            color: var(--text-accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-body {
+            padding: 20px 25px;
+        }
+
+        /* --- Tables for Alignment --- */
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .details-table td {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: top;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .label-col {
+            width: 180px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .value-col {
+            color: var(--text-primary);
+            font-family: var(--font-code);
+            line-height: 1.6;
+        }
+
+        .pre-wrap {
+            white-space: pre-wrap;
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 4px;
+            color: #d1d5db;
+        }
+
+        /* --- Error Box --- */
+        .error-box {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 5px solid var(--error);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .error-title {
+            color: var(--error);
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .error-msg {
+            font-size: 1.1rem;
+            color: #ffcccc;
+            font-weight: 500;
+            word-break: break-word;
+            /* Force wrapping for long JSON strings */
+            white-space: pre-wrap;
+            /* Preserve lines but wrap text */
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .clickable {
+            cursor: pointer;
+            color: var(--text-accent);
+            text-decoration: underline;
+            font-size: 0.9rem;
+        }
+
+        /* Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-passed {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+    </style>
+</head>
+
+<body>
+
+    <title>ThinxFresh API Report</title>
+
+    <div class="sidebar">
+        <div class="brand">
+            <h1>ThinxFresh</h1>
+            <div class="subtitle">Update Profile Report</div>
+        </div>
+
+        <div class="nav-stats">
+            <div class="stat-badge fail">
+                <span class="val">80%</span>
+                <span class="lbl">Pass Rate</span>
+            </div>
+            <div class="stat-badge">
+                <span class="val">30</span>
+                <span class="lbl">Total Tests</span>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search tests..." onkeyup="filterTests(this.value)">
+        </div>
+
+        <div class="chapter-list">
+            <div class="chapter-item active" onclick="showPage('dashboard')">
+                <span>📊 Dashboard</span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-1')"
+                data-name="valid_update_all_fields">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    valid_update_all_fields
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-2')"
+                data-name="no_changes_detected">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    no_changes_detected
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-3')"
+                data-name="missing_all_fields">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    missing_all_fields
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-4')"
+                data-name="missing_name">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    missing_name
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-5')"
+                data-name="missing_email">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    missing_email
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-6')"
+                data-name="missing_phone">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    missing_phone
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-7')"
+                data-name="name_whitespace_only">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    name_whitespace_only
+                </span>
+                <span class="status-dot dot-failed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-8')"
+                data-name="name_single_char">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    name_single_char
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-9')"
+                data-name="name_max_length_exceeded">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    name_max_length_exceeded
+                </span>
+                <span class="status-dot dot-failed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-10')"
+                data-name="name_with_numbers">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    name_with_numbers
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-11')"
+                data-name="name_with_special_chars">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    name_with_special_chars
+                </span>
+                <span class="status-dot dot-failed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-12')"
+                data-name="invalid_email_format">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_email_format
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-13')"
+                data-name="invalid_email_no_at">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_email_no_at
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-14')"
+                data-name="invalid_email_no_dot">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_email_no_dot
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-15')"
+                data-name="invalid_email_domain">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_email_domain
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-16')"
+                data-name="email_uppercase">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    email_uppercase
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-17')"
+                data-name="invalid_phone_alpha">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_phone_alpha
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-18')"
+                data-name="invalid_phone_special_chars">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_phone_special_chars
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-19')"
+                data-name="invalid_phone_short">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_phone_short
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-20')"
+                data-name="invalid_phone_long">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    invalid_phone_long
+                </span>
+                <span class="status-dot dot-failed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-21')"
+                data-name="phone_starts_with_0">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    phone_starts_with_0
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-22')"
+                data-name="phone_all_zeros">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    phone_all_zeros
+                </span>
+                <span class="status-dot dot-failed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-23')"
+                data-name="payload_with_extra_fields">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    payload_with_extra_fields
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-24')"
+                data-name="payload_null_values">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    payload_null_values
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-25')"
+                data-name="payload_incorrect_types">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    payload_incorrect_types
+                </span>
+                <span class="status-dot dot-failed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-26')"
+                data-name="empty_string_name">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    empty_string_name
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-27')"
+                data-name="empty_string_phone">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    empty_string_phone
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-28')"
+                data-name="empty_string_email">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    empty_string_email
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-29')"
+                data-name="update_phone_only">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    update_phone_only
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+            <div class="chapter-item test-link" onclick="showPage('test-30')"
+                data-name="unauthorized_no_token">
+                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;">
+                    unauthorized_no_token
+                </span>
+                <span class="status-dot dot-passed"></span>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="page-container active">
+            <div class="header-section">
+                <h2>Execution Summary</h2>
+                <div class="meta-info">Generated: 2025-12-17 16:34:56</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">Statistics</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        <tr>
+                            <td class="label-col">Total Duration</td>
+                            <td class="value-col">6.352s</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col">Total Tests</td>
+                            <td class="value-col">30</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col">Passed</td>
+                            <td class="value-col" style="color: var(--success)">24</td>
+                        </tr>
+                        <tr>
+                            <td class="label-col">Failed</td>
+                            <td class="value-col" style="color: var(--error)">6</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST CASES -->
+        
+        <div id="test-1" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[valid_update_all_fields]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.497s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Valid name, email, phone with dynamic data</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">200</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "DYNAMIC_NAME",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "DYNAMIC_PHONE"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-2" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[no_changes_detected]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.166s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Same name, email and phone</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">[200, 404, 400]</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-3" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[missing_all_fields]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.172s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Empty payload</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-4" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[missing_name]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.171s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Missing name field</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-5" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[missing_email]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.155s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Missing email field</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-6" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[missing_phone]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.183s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Missing phone field</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-7" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-failed">failed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[name_whitespace_only]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.171s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+            <div class="error-box">
+                <div class="error-title">Failure Reason</div>
+                <div class="error-msg">AssertionError: Expected 400, got 500. Body: {"message":"Internal server error while updating profile"}
+assert 500 == 400
++  where 500 = <Response [500]>.status_code</div>
+            </div>
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Name with only whitespace</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "   ",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+            <div class="card">
+                <div class="card-header">Execution Logs</div>
+                <div class="card-body">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="clickable" onclick="toggleLog(this)">Show Full Stack Trace ▶</div>
+                        <div class="hidden" style="margin-top: 10px;">
+                            <div class="pre-wrap" style="color: #ffcccc; border: 1px solid var(--error);">case = {'description': 'Name with only whitespace', 'expected_status': 400, 'name': 'name_whitespace_only', 'payload': {'email': 'aravind.m@gndsolutions.in', 'name': '   ', 'phone': '9398634487'}}
+auth_token = '{"access": "BqJtGID9MgOcNt8ztaq8DVnmQyybpWw0CIk3lhNphyLalQxIeI+iYkz+9hiaH5IUXX/BSQBocbQd2nqdyB7SeVm65SH9zcn0dEfy+WL1Q...HzHCZ3oWdaFoXUqguRaP7EQU9AGsd/fuh7phpwhzFF47jJF+F8GFvDvXUxMfSvhKhdrPfq8K3Gamio0T8cfsdFWkOnbvxKBSigK0ET7sdzCSHJyx6w=="}'
+
+    @pytest.mark.parametrize("case", TEST_CASES, ids=[c["name"] for c in TEST_CASES])
+    def test_update_profile_ddt(case, auth_token):
+    
+        # deepcopy to avoid modifying the original test data across iterations
+        payload = copy.deepcopy(case["payload"])
+    
+        # Handle Dynamic Data Generation
+        if payload.get("name") == "DYNAMIC_NAME":
+            random_suffix = ''.join(random.choices(string.ascii_uppercase, k=4))
+            payload["name"] = f"Aravind{random_suffix}"
+    
+        if payload.get("phone") == "DYNAMIC_PHONE":
+             # Generate random 10 digit number starting with 9
+            random_digits = ''.join(random.choices(string.digits, k=9))
+            payload["phone"] = f"9{random_digits}"
+    
+        headers = {"Content-Type": "application/json"}
+        if case.get("include_auth", True):
+            headers["Authorization"] = f"Bearer {auth_token}"
+    
+        response = requests.put(
+            UPDATE_PROFILE_URL,
+            json=payload,
+            headers=headers,
+            timeout=30,
+            verify=False
+        )
+    
+        print("Status:", response.status_code)
+        print("Body:", response.text)
+    
+        expected = case["expected_status"]
+        if isinstance(expected, list):
+            assert response.status_code in expected, f"Expected one of {expected}, got {response.status_code}. Body: {response.text}"
+        else:
+>           assert response.status_code == expected, f"Expected {expected}, got {response.status_code}. Body: {response.text}"
+E           AssertionError: Expected 400, got 500. Body: {"message":"Internal server error while updating profile"}
+E           assert 500 == 400
+E            +  where 500 = <Response [500]>.status_code
+
+tests\test_update_profile_ddt.py:58: AssertionError</div>
+                        </div>
+                    </div>
+                    
+
+                    
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <div id="test-8" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[name_single_char]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.169s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Name with single character (Verify min length)</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">200</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "A",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-9" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-failed">failed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[name_max_length_exceeded]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.232s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+            <div class="error-box">
+                <div class="error-title">Failure Reason</div>
+                <div class="error-msg">AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"AravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMM","phone":"9398634487","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:51.759Z"}}
+assert 200 == 400
++  where 200 = <Response [200]>.status_code</div>
+            </div>
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Name exceeding typical max length (e.g. 50+ chars)</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+            <div class="card">
+                <div class="card-header">Execution Logs</div>
+                <div class="card-body">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="clickable" onclick="toggleLog(this)">Show Full Stack Trace ▶</div>
+                        <div class="hidden" style="margin-top: 10px;">
+                            <div class="pre-wrap" style="color: #ffcccc; border: 1px solid var(--error);">case = {'description': 'Name exceeding typical max length (e.g. 50+ chars)', 'expected_status': 400, 'name': 'name_max_length...', 'name': 'AravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMM', 'phone': '9398634487'}}
+auth_token = '{"access": "BqJtGID9MgOcNt8ztaq8DVnmQyybpWw0CIk3lhNphyLalQxIeI+iYkz+9hiaH5IUXX/BSQBocbQd2nqdyB7SeVm65SH9zcn0dEfy+WL1Q...HzHCZ3oWdaFoXUqguRaP7EQU9AGsd/fuh7phpwhzFF47jJF+F8GFvDvXUxMfSvhKhdrPfq8K3Gamio0T8cfsdFWkOnbvxKBSigK0ET7sdzCSHJyx6w=="}'
+
+    @pytest.mark.parametrize("case", TEST_CASES, ids=[c["name"] for c in TEST_CASES])
+    def test_update_profile_ddt(case, auth_token):
+    
+        # deepcopy to avoid modifying the original test data across iterations
+        payload = copy.deepcopy(case["payload"])
+    
+        # Handle Dynamic Data Generation
+        if payload.get("name") == "DYNAMIC_NAME":
+            random_suffix = ''.join(random.choices(string.ascii_uppercase, k=4))
+            payload["name"] = f"Aravind{random_suffix}"
+    
+        if payload.get("phone") == "DYNAMIC_PHONE":
+             # Generate random 10 digit number starting with 9
+            random_digits = ''.join(random.choices(string.digits, k=9))
+            payload["phone"] = f"9{random_digits}"
+    
+        headers = {"Content-Type": "application/json"}
+        if case.get("include_auth", True):
+            headers["Authorization"] = f"Bearer {auth_token}"
+    
+        response = requests.put(
+            UPDATE_PROFILE_URL,
+            json=payload,
+            headers=headers,
+            timeout=30,
+            verify=False
+        )
+    
+        print("Status:", response.status_code)
+        print("Body:", response.text)
+    
+        expected = case["expected_status"]
+        if isinstance(expected, list):
+            assert response.status_code in expected, f"Expected one of {expected}, got {response.status_code}. Body: {response.text}"
+        else:
+>           assert response.status_code == expected, f"Expected {expected}, got {response.status_code}. Body: {response.text}"
+E           AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"AravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMM","phone":"9398634487","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:51.759Z"}}
+E           assert 200 == 400
+E            +  where 200 = <Response [200]>.status_code
+
+tests\test_update_profile_ddt.py:58: AssertionError</div>
+                        </div>
+                    </div>
+                    
+
+                    
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <div id="test-10" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[name_with_numbers]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.157s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Name containing numbers</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">200</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "Aravind123",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-11" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-failed">failed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[name_with_special_chars]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.177s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+            <div class="error-box">
+                <div class="error-title">Failure Reason</div>
+                <div class="error-msg">AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"Aravind@","phone":"9398634487","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:52.119Z"}}
+assert 200 == 400
++  where 200 = <Response [200]>.status_code</div>
+            </div>
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Name containing special characters</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "Aravind@#$",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+            <div class="card">
+                <div class="card-header">Execution Logs</div>
+                <div class="card-body">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="clickable" onclick="toggleLog(this)">Show Full Stack Trace ▶</div>
+                        <div class="hidden" style="margin-top: 10px;">
+                            <div class="pre-wrap" style="color: #ffcccc; border: 1px solid var(--error);">case = {'description': 'Name containing special characters', 'expected_status': 400, 'name': 'name_with_special_chars', 'payload': {'email': 'aravind.m@gndsolutions.in', 'name': 'Aravind@#$', 'phone': '9398634487'}}
+auth_token = '{"access": "BqJtGID9MgOcNt8ztaq8DVnmQyybpWw0CIk3lhNphyLalQxIeI+iYkz+9hiaH5IUXX/BSQBocbQd2nqdyB7SeVm65SH9zcn0dEfy+WL1Q...HzHCZ3oWdaFoXUqguRaP7EQU9AGsd/fuh7phpwhzFF47jJF+F8GFvDvXUxMfSvhKhdrPfq8K3Gamio0T8cfsdFWkOnbvxKBSigK0ET7sdzCSHJyx6w=="}'
+
+    @pytest.mark.parametrize("case", TEST_CASES, ids=[c["name"] for c in TEST_CASES])
+    def test_update_profile_ddt(case, auth_token):
+    
+        # deepcopy to avoid modifying the original test data across iterations
+        payload = copy.deepcopy(case["payload"])
+    
+        # Handle Dynamic Data Generation
+        if payload.get("name") == "DYNAMIC_NAME":
+            random_suffix = ''.join(random.choices(string.ascii_uppercase, k=4))
+            payload["name"] = f"Aravind{random_suffix}"
+    
+        if payload.get("phone") == "DYNAMIC_PHONE":
+             # Generate random 10 digit number starting with 9
+            random_digits = ''.join(random.choices(string.digits, k=9))
+            payload["phone"] = f"9{random_digits}"
+    
+        headers = {"Content-Type": "application/json"}
+        if case.get("include_auth", True):
+            headers["Authorization"] = f"Bearer {auth_token}"
+    
+        response = requests.put(
+            UPDATE_PROFILE_URL,
+            json=payload,
+            headers=headers,
+            timeout=30,
+            verify=False
+        )
+    
+        print("Status:", response.status_code)
+        print("Body:", response.text)
+    
+        expected = case["expected_status"]
+        if isinstance(expected, list):
+            assert response.status_code in expected, f"Expected one of {expected}, got {response.status_code}. Body: {response.text}"
+        else:
+>           assert response.status_code == expected, f"Expected {expected}, got {response.status_code}. Body: {response.text}"
+E           AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"Aravind@","phone":"9398634487","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:52.119Z"}}
+E           assert 200 == 400
+E            +  where 200 = <Response [200]>.status_code
+
+tests\test_update_profile_ddt.py:58: AssertionError</div>
+                        </div>
+                    </div>
+                    
+
+                    
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <div id="test-12" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_email_format]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.180s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Invalid email format</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@invalid",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-13" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_email_no_at]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.173s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Email without @ symbol</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.mgndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-14" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_email_no_dot]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.192s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Email without dot in domain</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutionsin",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-15" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_email_domain]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.161s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Email outside allowed domains</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind@yahoo.com",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-16" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[email_uppercase]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.235s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Email with uppercase letters</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">200</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "ARAVIND.M@GNDSOLUTIONS.IN",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-17" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_phone_alpha]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.199s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Phone contains alphabets</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "93986ABCD"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-18" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_phone_special_chars]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.172s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Phone contains special characters</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "93986@#$%"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-19" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_phone_short]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.181s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Phone less than 10 digits</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "12345"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-20" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-failed">failed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[invalid_phone_long]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.186s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+            <div class="error-box">
+                <div class="error-title">Failure Reason</div>
+                <div class="error-msg">AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"AravindMM","phone":"939863448700","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:53.836Z"}}
+assert 200 == 400
++  where 200 = <Response [200]>.status_code</div>
+            </div>
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Phone more than 10 digits</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "939863448700"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+            <div class="card">
+                <div class="card-header">Execution Logs</div>
+                <div class="card-body">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="clickable" onclick="toggleLog(this)">Show Full Stack Trace ▶</div>
+                        <div class="hidden" style="margin-top: 10px;">
+                            <div class="pre-wrap" style="color: #ffcccc; border: 1px solid var(--error);">case = {'description': 'Phone more than 10 digits', 'expected_status': 400, 'name': 'invalid_phone_long', 'payload': {'email': 'aravind.m@gndsolutions.in', 'name': 'AravindMM', 'phone': '939863448700'}}
+auth_token = '{"access": "BqJtGID9MgOcNt8ztaq8DVnmQyybpWw0CIk3lhNphyLalQxIeI+iYkz+9hiaH5IUXX/BSQBocbQd2nqdyB7SeVm65SH9zcn0dEfy+WL1Q...HzHCZ3oWdaFoXUqguRaP7EQU9AGsd/fuh7phpwhzFF47jJF+F8GFvDvXUxMfSvhKhdrPfq8K3Gamio0T8cfsdFWkOnbvxKBSigK0ET7sdzCSHJyx6w=="}'
+
+    @pytest.mark.parametrize("case", TEST_CASES, ids=[c["name"] for c in TEST_CASES])
+    def test_update_profile_ddt(case, auth_token):
+    
+        # deepcopy to avoid modifying the original test data across iterations
+        payload = copy.deepcopy(case["payload"])
+    
+        # Handle Dynamic Data Generation
+        if payload.get("name") == "DYNAMIC_NAME":
+            random_suffix = ''.join(random.choices(string.ascii_uppercase, k=4))
+            payload["name"] = f"Aravind{random_suffix}"
+    
+        if payload.get("phone") == "DYNAMIC_PHONE":
+             # Generate random 10 digit number starting with 9
+            random_digits = ''.join(random.choices(string.digits, k=9))
+            payload["phone"] = f"9{random_digits}"
+    
+        headers = {"Content-Type": "application/json"}
+        if case.get("include_auth", True):
+            headers["Authorization"] = f"Bearer {auth_token}"
+    
+        response = requests.put(
+            UPDATE_PROFILE_URL,
+            json=payload,
+            headers=headers,
+            timeout=30,
+            verify=False
+        )
+    
+        print("Status:", response.status_code)
+        print("Body:", response.text)
+    
+        expected = case["expected_status"]
+        if isinstance(expected, list):
+            assert response.status_code in expected, f"Expected one of {expected}, got {response.status_code}. Body: {response.text}"
+        else:
+>           assert response.status_code == expected, f"Expected {expected}, got {response.status_code}. Body: {response.text}"
+E           AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"AravindMM","phone":"939863448700","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:53.836Z"}}
+E           assert 200 == 400
+E            +  where 200 = <Response [200]>.status_code
+
+tests\test_update_profile_ddt.py:58: AssertionError</div>
+                        </div>
+                    </div>
+                    
+
+                    
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <div id="test-21" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[phone_starts_with_0]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.214s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Phone starting with 0</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">200</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "0987654321"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-22" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-failed">failed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[phone_all_zeros]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.204s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+            <div class="error-box">
+                <div class="error-title">Failure Reason</div>
+                <div class="error-msg">AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"AravindMM","phone":"0000000000","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:54.266Z"}}
+assert 200 == 400
++  where 200 = <Response [200]>.status_code</div>
+            </div>
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Phone with all zeros</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "0000000000"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+            <div class="card">
+                <div class="card-header">Execution Logs</div>
+                <div class="card-body">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="clickable" onclick="toggleLog(this)">Show Full Stack Trace ▶</div>
+                        <div class="hidden" style="margin-top: 10px;">
+                            <div class="pre-wrap" style="color: #ffcccc; border: 1px solid var(--error);">case = {'description': 'Phone with all zeros', 'expected_status': 400, 'name': 'phone_all_zeros', 'payload': {'email': 'aravind.m@gndsolutions.in', 'name': 'AravindMM', 'phone': '0000000000'}}
+auth_token = '{"access": "BqJtGID9MgOcNt8ztaq8DVnmQyybpWw0CIk3lhNphyLalQxIeI+iYkz+9hiaH5IUXX/BSQBocbQd2nqdyB7SeVm65SH9zcn0dEfy+WL1Q...HzHCZ3oWdaFoXUqguRaP7EQU9AGsd/fuh7phpwhzFF47jJF+F8GFvDvXUxMfSvhKhdrPfq8K3Gamio0T8cfsdFWkOnbvxKBSigK0ET7sdzCSHJyx6w=="}'
+
+    @pytest.mark.parametrize("case", TEST_CASES, ids=[c["name"] for c in TEST_CASES])
+    def test_update_profile_ddt(case, auth_token):
+    
+        # deepcopy to avoid modifying the original test data across iterations
+        payload = copy.deepcopy(case["payload"])
+    
+        # Handle Dynamic Data Generation
+        if payload.get("name") == "DYNAMIC_NAME":
+            random_suffix = ''.join(random.choices(string.ascii_uppercase, k=4))
+            payload["name"] = f"Aravind{random_suffix}"
+    
+        if payload.get("phone") == "DYNAMIC_PHONE":
+             # Generate random 10 digit number starting with 9
+            random_digits = ''.join(random.choices(string.digits, k=9))
+            payload["phone"] = f"9{random_digits}"
+    
+        headers = {"Content-Type": "application/json"}
+        if case.get("include_auth", True):
+            headers["Authorization"] = f"Bearer {auth_token}"
+    
+        response = requests.put(
+            UPDATE_PROFILE_URL,
+            json=payload,
+            headers=headers,
+            timeout=30,
+            verify=False
+        )
+    
+        print("Status:", response.status_code)
+        print("Body:", response.text)
+    
+        expected = case["expected_status"]
+        if isinstance(expected, list):
+            assert response.status_code in expected, f"Expected one of {expected}, got {response.status_code}. Body: {response.text}"
+        else:
+>           assert response.status_code == expected, f"Expected {expected}, got {response.status_code}. Body: {response.text}"
+E           AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"AravindMM","phone":"0000000000","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:54.266Z"}}
+E           assert 200 == 400
+E            +  where 200 = <Response [200]>.status_code
+
+tests\test_update_profile_ddt.py:58: AssertionError</div>
+                        </div>
+                    </div>
+                    
+
+                    
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <div id="test-23" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[payload_with_extra_fields]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.210s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Payload with unexpected fields</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">200</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487",
+  "age": 25,
+  "role": "ADMIN"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-24" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[payload_null_values]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.173s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Fields with null values</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": null,
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-25" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-failed">failed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[payload_incorrect_types]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.172s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+            <div class="error-box">
+                <div class="error-title">Failure Reason</div>
+                <div class="error-msg">AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"12345","phone":"9398634487","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:54.834Z"}}
+assert 200 == 400
++  where 200 = <Response [200]>.status_code</div>
+            </div>
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Incorrect data types (integer for name)</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": 12345,
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+            <div class="card">
+                <div class="card-header">Execution Logs</div>
+                <div class="card-body">
+                    
+                    <div style="margin-bottom: 20px;">
+                        <div class="clickable" onclick="toggleLog(this)">Show Full Stack Trace ▶</div>
+                        <div class="hidden" style="margin-top: 10px;">
+                            <div class="pre-wrap" style="color: #ffcccc; border: 1px solid var(--error);">case = {'description': 'Incorrect data types (integer for name)', 'expected_status': 400, 'name': 'payload_incorrect_types', 'payload': {'email': 'aravind.m@gndsolutions.in', 'name': 12345, 'phone': '9398634487'}}
+auth_token = '{"access": "BqJtGID9MgOcNt8ztaq8DVnmQyybpWw0CIk3lhNphyLalQxIeI+iYkz+9hiaH5IUXX/BSQBocbQd2nqdyB7SeVm65SH9zcn0dEfy+WL1Q...HzHCZ3oWdaFoXUqguRaP7EQU9AGsd/fuh7phpwhzFF47jJF+F8GFvDvXUxMfSvhKhdrPfq8K3Gamio0T8cfsdFWkOnbvxKBSigK0ET7sdzCSHJyx6w=="}'
+
+    @pytest.mark.parametrize("case", TEST_CASES, ids=[c["name"] for c in TEST_CASES])
+    def test_update_profile_ddt(case, auth_token):
+    
+        # deepcopy to avoid modifying the original test data across iterations
+        payload = copy.deepcopy(case["payload"])
+    
+        # Handle Dynamic Data Generation
+        if payload.get("name") == "DYNAMIC_NAME":
+            random_suffix = ''.join(random.choices(string.ascii_uppercase, k=4))
+            payload["name"] = f"Aravind{random_suffix}"
+    
+        if payload.get("phone") == "DYNAMIC_PHONE":
+             # Generate random 10 digit number starting with 9
+            random_digits = ''.join(random.choices(string.digits, k=9))
+            payload["phone"] = f"9{random_digits}"
+    
+        headers = {"Content-Type": "application/json"}
+        if case.get("include_auth", True):
+            headers["Authorization"] = f"Bearer {auth_token}"
+    
+        response = requests.put(
+            UPDATE_PROFILE_URL,
+            json=payload,
+            headers=headers,
+            timeout=30,
+            verify=False
+        )
+    
+        print("Status:", response.status_code)
+        print("Body:", response.text)
+    
+        expected = case["expected_status"]
+        if isinstance(expected, list):
+            assert response.status_code in expected, f"Expected one of {expected}, got {response.status_code}. Body: {response.text}"
+        else:
+>           assert response.status_code == expected, f"Expected {expected}, got {response.status_code}. Body: {response.text}"
+E           AssertionError: Expected 400, got 200. Body: {"message":"Profile updated successfully","user":{"_id":"68888eb1d61f74421e12f99f","email":"aravind.m@gndsolutions.in","username":"12345","phone":"9398634487","role":"ADMIN","apps":["thinxfresh","thinxflow","thinxview","thinxsense"],"is_active":true,"date_display_format":"MM/DD/YYYY","temperature_unit":"C","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata","updatedAt":"2025-12-17T11:04:54.834Z"}}
+E           assert 200 == 400
+E            +  where 200 = <Response [200]>.status_code
+
+tests\test_update_profile_ddt.py:58: AssertionError</div>
+                        </div>
+                    </div>
+                    
+
+                    
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <div id="test-26" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[empty_string_name]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.157s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Empty string for name</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-27" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[empty_string_phone]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.223s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Empty string for phone</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": ""
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-28" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[empty_string_email]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.166s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Empty string for email</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">400</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-29" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[update_phone_only]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.246s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Updating only phone number (Dynamic)</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">200</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "DYNAMIC_PHONE"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+        <div id="test-30" class="page-container">
+
+            <div class="header-section">
+                <div>
+                    <div style="margin-bottom: 10px;">
+                        <span class="status-badge badge-passed">passed</span>
+                    </div>
+                    <h2>test_update_profile_ddt[unauthorized_no_token]</h2>
+                    <div style="color: var(--text-secondary); margin-top: 5px;">None:None</div>
+                </div>
+                <div class="meta-info">0.183s</div>
+            </div>
+
+            <!-- Error Section -->
+            
+
+            <!-- Test Data Card -->
+            <div class="card">
+                <div class="card-header">Test Data</div>
+                <div class="card-body">
+                    <table class="details-table">
+                        
+                        <tr>
+                            <td class="label-col">Description</td>
+                            <td class="value-col" style="font-family: var(--font-main);">Missing authorization header</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Expected Status</td>
+                            <td class="value-col">401</td>
+                        </tr>
+                        
+
+                        
+                        <tr>
+                            <td class="label-col">Payload</td>
+                            <td class="value-col">
+                                <div class="pre-wrap">{
+  "name": "AravindMM",
+  "email": "aravind.m@gndsolutions.in",
+  "phone": "9398634487"
+}</div>
+                            </td>
+                        </tr>
+                        
+                    </table>
+                </div>
+            </div>
+
+            <!-- Logs / Output -->
+            
+
+        </div>
+        
+
+    </div>
+
+    <script>
+        function showPage(id) {
+            document.querySelectorAll('.page-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+
+            document.querySelectorAll('.chapter-item').forEach(el => el.classList.remove('active'));
+            // Highlight sidebar item
+            const clicked = Array.from(document.querySelectorAll('.chapter-item')).find(el => {
+                const onclick = el.getAttribute('onclick');
+                return onclick && onclick.includes(`'${id}'`);
+            });
+            if (clicked) clicked.classList.add('active');
+        }
+
+        function filterTests(query) {
+            const term = query.toLowerCase();
+            document.querySelectorAll('.test-link').forEach(el => {
+                const name = el.getAttribute('data-name').toLowerCase();
+                el.style.display = name.includes(term) ? 'flex' : 'none';
+            });
+        }
+
+        function toggleLog(el) {
+            const content = el.nextElementSibling;
+            const isHidden = content.classList.contains('hidden');
+            if (isHidden) {
+                content.classList.remove('hidden');
+                el.innerText = "Hide Full Stack Trace ▼";
+            } else {
+                content.classList.add('hidden');
+                el.innerText = "Show Full Stack Trace ▶";
+            }
+        }
+    </script>
+</body>
+
+</html>

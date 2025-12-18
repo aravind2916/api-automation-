@@ -1,0 +1,91 @@
+[
+  {
+    "name": "valid_page_1",
+    "description": "Valid request with page=1 and per_page=25",
+    "query_params": {
+      "page": 1,
+      "per_page": 25
+    },
+    "expected_status": 200,
+    "expect_sensor_list": true
+  },
+  {
+    "name": "valid_page_2",
+    "description": "Valid request page=2 and per_page=25",
+    "query_params": {
+      "page": 2,
+      "per_page": 25
+    },
+    "expected_status": 200,
+    "expect_sensor_list": true
+  },
+  {
+    "name": "missing_page_param",
+    "description": "Missing page parameter should default automatically",
+    "query_params": {
+      "per_page": 25
+    },
+    "expected_status": 200,
+    "expect_sensor_list": true
+  },
+  {
+    "name": "missing_per_page_param",
+    "description": "Missing per_page parameter",
+    "query_params": {
+      "page": 1
+    },
+    "expected_status": 200,
+    "expect_sensor_list": true
+  },
+  {
+    "name": "zero_page",
+    "description": "Zero page is invalid",
+    "query_params": {
+      "page": 0,
+      "per_page": 25
+    },
+    "expected_status": 400,
+    "expect_error_message": true
+  },
+  {
+    "name": "negative_page",
+    "description": "Negative page number should return error",
+    "query_params": {
+      "page": -1,
+      "per_page": 25
+    },
+    "expected_status": 400,
+    "expect_error_message": true
+  },
+  {
+    "name": "negative_per_page",
+    "description": "Negative per_page parameter should return error",
+    "query_params": {
+      "page": 1,
+      "per_page": -10
+    },
+    "expected_status": 400,
+    "expect_error_message": true
+  },
+  {
+    "name": "string_page_param",
+    "description": "Page value as string should throw error",
+    "query_params": {
+      "page": "abc",
+      "per_page": 25
+    },
+    "expected_status": 400,
+    "expect_error_message": true
+  },
+  {
+    "name": "unauthorized_request",
+    "description": "Request without token should return 401",
+    "query_params": {
+      "page": 1,
+      "per_page": 25
+    },
+    "include_auth": false,
+    "expected_status": 401,
+    "expect_error_message": true
+  }
+]

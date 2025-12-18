@@ -1,0 +1,136 @@
+[
+  {
+    "name": "valid_completed_trip",
+    "description": "Valid request with correct sensor and trip name",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_data": true,
+    "validate_history": true,
+    "validate_logs": true,
+    "validate_alerts": true,
+    "require_non_empty_history": true,
+    "require_non_empty_logs": true,
+    "require_non_empty_alerts": true
+  },
+  {
+    "name": "missing_authorization",
+    "description": "Should reject without authorization token",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": false,
+    "expected_status": 401
+  },
+  {
+    "name": "invalid_sensor_id",
+    "description": "Unknown sensor ID should return no data or error",
+    "sensor_id": "INVALID_99999",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 404,
+    "expect_empty_data": true
+  },
+  {
+    "name": "wrong_trip_name",
+    "description": "Incorrect tripName should return empty dataset",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "abcdef"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_empty_data": true
+  },
+  {
+    "name": "empty_trip_name",
+    "description": "Empty 'name' parameter, backend should reject",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": ""
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "numeric_trip_name",
+    "description": "Invalid data type in query parameter",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": 12345
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "sensor_id_case_sensitivity",
+    "description": "Sensor ID in lowercase to verify case sensitivity",
+    "sensor_id": "tf60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 404
+  },
+  {
+    "name": "validate_timestamp_order",
+    "description": "Trip history timestamps must be in ascending order",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "validate_history": true
+  },
+  {
+    "name": "battery_range_validation",
+    "description": "Battery values must be between 0 and 100",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "validate_logs": true
+  },
+  {
+    "name": "movement_data_validity",
+    "description": "Movement values must be only 0 or 1",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "validate_logs": true
+  },
+  {
+    "name": "alert_structure_validation",
+    "description": "Each alert must include temperature/humidity and payload structure",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "validate_alerts": true
+  },
+  {
+    "name": "avg_data_validation",
+    "description": "Validate averagedData entries for required attributes",
+    "sensor_id": "TF60000052",
+    "query_params": {
+      "name": "tryutey"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "validate_avg_data": true
+  }
+]

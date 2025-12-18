@@ -1,0 +1,301 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.0.1, pluggy-1.6.0 -- C:\Users\AravindMaddineni\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.9', 'Platform': 'Windows-11-10.0.26200-SP0', 'Packages': {'pytest': '9.0.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'metadata': '3.1.1'}}
+rootdir: C:\Users\AravindMaddineni\Downloads\Apitest2 1\APITesting\APITesting
+configfile: pytest.ini
+plugins: html-4.1.1, metadata-3.1.1
+collecting ... collected 6 items
+
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_update_password] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_new_password] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_confirm_password] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[empty_payload] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[no_auth_header] ERROR
+
+=================================== ERRORS ====================================
+______ ERROR at setup of test_update_password_ddt[valid_update_password] ______
+
+    @pytest.fixture(scope="session")
+    def auth_token():
+        """
+        Returns ONLY access token string
+        """
+        response = requests.post(LOGIN_URL, json=LOGIN_PAYLOAD, verify=False, timeout=30)
+>       response.raise_for_status()
+
+conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Response [400]>
+
+    def raise_for_status(self):
+        """Raises :class:`HTTPError`, if one occurred."""
+    
+        http_error_msg = ""
+        if isinstance(self.reason, bytes):
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = self.reason.decode("utf-8")
+            except UnicodeDecodeError:
+                reason = self.reason.decode("iso-8859-1")
+        else:
+            reason = self.reason
+    
+        if 400 <= self.status_code < 500:
+            http_error_msg = (
+                f"{self.status_code} Client Error: {reason} for url: {self.url}"
+            )
+    
+        elif 500 <= self.status_code < 600:
+            http_error_msg = (
+                f"{self.status_code} Server Error: {reason} for url: {self.url}"
+            )
+    
+        if http_error_msg:
+>           raise HTTPError(http_error_msg, response=self)
+E           requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+
+..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py:1026: HTTPError
+________ ERROR at setup of test_update_password_ddt[password_mismatch] ________
+
+    @pytest.fixture(scope="session")
+    def auth_token():
+        """
+        Returns ONLY access token string
+        """
+        response = requests.post(LOGIN_URL, json=LOGIN_PAYLOAD, verify=False, timeout=30)
+>       response.raise_for_status()
+
+conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Response [400]>
+
+    def raise_for_status(self):
+        """Raises :class:`HTTPError`, if one occurred."""
+    
+        http_error_msg = ""
+        if isinstance(self.reason, bytes):
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = self.reason.decode("utf-8")
+            except UnicodeDecodeError:
+                reason = self.reason.decode("iso-8859-1")
+        else:
+            reason = self.reason
+    
+        if 400 <= self.status_code < 500:
+            http_error_msg = (
+                f"{self.status_code} Client Error: {reason} for url: {self.url}"
+            )
+    
+        elif 500 <= self.status_code < 600:
+            http_error_msg = (
+                f"{self.status_code} Server Error: {reason} for url: {self.url}"
+            )
+    
+        if http_error_msg:
+>           raise HTTPError(http_error_msg, response=self)
+E           requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+
+..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py:1026: HTTPError
+______ ERROR at setup of test_update_password_ddt[missing_new_password] _______
+
+    @pytest.fixture(scope="session")
+    def auth_token():
+        """
+        Returns ONLY access token string
+        """
+        response = requests.post(LOGIN_URL, json=LOGIN_PAYLOAD, verify=False, timeout=30)
+>       response.raise_for_status()
+
+conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Response [400]>
+
+    def raise_for_status(self):
+        """Raises :class:`HTTPError`, if one occurred."""
+    
+        http_error_msg = ""
+        if isinstance(self.reason, bytes):
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = self.reason.decode("utf-8")
+            except UnicodeDecodeError:
+                reason = self.reason.decode("iso-8859-1")
+        else:
+            reason = self.reason
+    
+        if 400 <= self.status_code < 500:
+            http_error_msg = (
+                f"{self.status_code} Client Error: {reason} for url: {self.url}"
+            )
+    
+        elif 500 <= self.status_code < 600:
+            http_error_msg = (
+                f"{self.status_code} Server Error: {reason} for url: {self.url}"
+            )
+    
+        if http_error_msg:
+>           raise HTTPError(http_error_msg, response=self)
+E           requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+
+..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py:1026: HTTPError
+____ ERROR at setup of test_update_password_ddt[missing_confirm_password] _____
+
+    @pytest.fixture(scope="session")
+    def auth_token():
+        """
+        Returns ONLY access token string
+        """
+        response = requests.post(LOGIN_URL, json=LOGIN_PAYLOAD, verify=False, timeout=30)
+>       response.raise_for_status()
+
+conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Response [400]>
+
+    def raise_for_status(self):
+        """Raises :class:`HTTPError`, if one occurred."""
+    
+        http_error_msg = ""
+        if isinstance(self.reason, bytes):
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = self.reason.decode("utf-8")
+            except UnicodeDecodeError:
+                reason = self.reason.decode("iso-8859-1")
+        else:
+            reason = self.reason
+    
+        if 400 <= self.status_code < 500:
+            http_error_msg = (
+                f"{self.status_code} Client Error: {reason} for url: {self.url}"
+            )
+    
+        elif 500 <= self.status_code < 600:
+            http_error_msg = (
+                f"{self.status_code} Server Error: {reason} for url: {self.url}"
+            )
+    
+        if http_error_msg:
+>           raise HTTPError(http_error_msg, response=self)
+E           requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+
+..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py:1026: HTTPError
+__________ ERROR at setup of test_update_password_ddt[empty_payload] __________
+
+    @pytest.fixture(scope="session")
+    def auth_token():
+        """
+        Returns ONLY access token string
+        """
+        response = requests.post(LOGIN_URL, json=LOGIN_PAYLOAD, verify=False, timeout=30)
+>       response.raise_for_status()
+
+conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Response [400]>
+
+    def raise_for_status(self):
+        """Raises :class:`HTTPError`, if one occurred."""
+    
+        http_error_msg = ""
+        if isinstance(self.reason, bytes):
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = self.reason.decode("utf-8")
+            except UnicodeDecodeError:
+                reason = self.reason.decode("iso-8859-1")
+        else:
+            reason = self.reason
+    
+        if 400 <= self.status_code < 500:
+            http_error_msg = (
+                f"{self.status_code} Client Error: {reason} for url: {self.url}"
+            )
+    
+        elif 500 <= self.status_code < 600:
+            http_error_msg = (
+                f"{self.status_code} Server Error: {reason} for url: {self.url}"
+            )
+    
+        if http_error_msg:
+>           raise HTTPError(http_error_msg, response=self)
+E           requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+
+..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py:1026: HTTPError
+_________ ERROR at setup of test_update_password_ddt[no_auth_header] __________
+
+    @pytest.fixture(scope="session")
+    def auth_token():
+        """
+        Returns ONLY access token string
+        """
+        response = requests.post(LOGIN_URL, json=LOGIN_PAYLOAD, verify=False, timeout=30)
+>       response.raise_for_status()
+
+conftest.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <Response [400]>
+
+    def raise_for_status(self):
+        """Raises :class:`HTTPError`, if one occurred."""
+    
+        http_error_msg = ""
+        if isinstance(self.reason, bytes):
+            # We attempt to decode utf-8 first because some servers
+            # choose to localize their reason strings. If the string
+            # isn't utf-8, we fall back to iso-8859-1 for all other
+            # encodings. (See PR #3538)
+            try:
+                reason = self.reason.decode("utf-8")
+            except UnicodeDecodeError:
+                reason = self.reason.decode("iso-8859-1")
+        else:
+            reason = self.reason
+    
+        if 400 <= self.status_code < 500:
+            http_error_msg = (
+                f"{self.status_code} Client Error: {reason} for url: {self.url}"
+            )
+    
+        elif 500 <= self.status_code < 600:
+            http_error_msg = (
+                f"{self.status_code} Server Error: {reason} for url: {self.url}"
+            )
+    
+        if http_error_msg:
+>           raise HTTPError(http_error_msg, response=self)
+E           requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+
+..\..\..\..\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\requests\models.py:1026: HTTPError
+=========================== short test summary info ===========================
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[valid_update_password] - requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch] - requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_new_password] - requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_confirm_password] - requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[empty_payload] - requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[no_auth_header] - requests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://authentication.thinxview.com/api/auth/login/
+============================== 6 errors in 0.65s ==============================

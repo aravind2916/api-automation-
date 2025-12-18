@@ -1,0 +1,103 @@
+[
+  {
+    "name": "valid_default_pagination",
+    "description": "Valid request with default pagination, expect 200 and some ongoing items",
+    "query_params": {
+      "order": "desc",
+      "per_page": 10,
+      "page": 1
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "validate_ongoing_items": true,
+    "expect_items": true,
+    "check_order_desc": true
+  },
+  {
+    "name": "missing_authorization",
+    "description": "Request without Authorization header should be unauthorized",
+    "query_params": {
+      "order": "desc",
+      "per_page": 10,
+      "page": 1
+    },
+    "include_auth": false,
+    "expected_status": 401
+  },
+  {
+    "name": "invalid_page_zero",
+    "description": "Page = 0 is invalid, should return 4xx",
+    "query_params": {
+      "order": "desc",
+      "per_page": 10,
+      "page": 0
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "invalid_page_negative",
+    "description": "Negative page number should return 4xx",
+    "query_params": {
+      "order": "desc",
+      "per_page": 10,
+      "page": -1
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "invalid_per_page_zero",
+    "description": "per_page = 0 should not be accepted",
+    "query_params": {
+      "order": "desc",
+      "per_page": 0,
+      "page": 1
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "invalid_order_value",
+    "description": "Invalid order parameter value",
+    "query_params": {
+      "order": "invalid",
+      "per_page": 10,
+      "page": 1
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "small_per_page_limit",
+    "description": "Smaller per_page, ensure number of items does not exceed per_page",
+    "query_params": {
+      "order": "desc",
+      "per_page": 2,
+      "page": 1
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_items": true,
+    "check_per_page_limit": true
+  },
+  {
+    "name": "page_out_of_range",
+    "description": "Very high page number should return 200 with empty items (if implemented like that)",
+    "query_params": {
+      "order": "desc",
+      "per_page": 10,
+      "page": 999
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_empty": true
+  },
+  {
+    "name": "no_query_params",
+    "description": "No query parameters, API should use defaults",
+    "query_params": {},
+    "include_auth": true,
+    "expected_status": 200
+  }
+]

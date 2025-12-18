@@ -1,0 +1,26 @@
+[
+  {
+    "name": "valid_available_sensors_first_call",
+    "description": "First authorized call should return 200 and list of available sensors",
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "valid_available_sensors_second_call",
+    "description": "Second authorized call should also return 200 and same structure",
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "valid_available_sensors_third_call",
+    "description": "Third authorized call to ensure repeated calls work fine",
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "unauthorized_request",
+    "description": "Missing Authorization header should return 401",
+    "include_auth": false,
+    "expected_status": 401
+  }
+]

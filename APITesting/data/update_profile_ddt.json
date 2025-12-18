@@ -1,0 +1,302 @@
+[
+    {
+        "name": "valid_update_all_fields",
+        "description": "Valid name, email, phone with dynamic data",
+        "payload": {
+            "name": "DYNAMIC_NAME",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "DYNAMIC_PHONE"
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "no_changes_detected",
+        "description": "Same name, email and phone",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": [
+            200,
+            404,
+            400
+        ]
+    },
+    {
+        "name": "missing_all_fields",
+        "description": "Empty payload",
+        "payload": {},
+        "expected_status": 400
+    },
+    {
+        "name": "missing_name",
+        "description": "Missing name field",
+        "payload": {
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "missing_email",
+        "description": "Missing email field",
+        "payload": {
+            "name": "AravindMM",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "missing_phone",
+        "description": "Missing phone field",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "name_whitespace_only",
+        "description": "Name with only whitespace",
+        "payload": {
+            "name": "   ",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "name_single_char",
+        "description": "Name with single character (Verify min length)",
+        "payload": {
+            "name": "A",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "name_max_length_exceeded",
+        "description": "Name exceeding typical max length (e.g. 50+ chars)",
+        "payload": {
+            "name": "AravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMMAravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "name_with_numbers",
+        "description": "Name containing numbers",
+        "payload": {
+            "name": "Aravind123",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "name_with_special_chars",
+        "description": "Name containing special characters",
+        "payload": {
+            "name": "Aravind@#$",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "invalid_email_format",
+        "description": "Invalid email format",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@invalid",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "invalid_email_no_at",
+        "description": "Email without @ symbol",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.mgndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "invalid_email_no_dot",
+        "description": "Email without dot in domain",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutionsin",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "invalid_email_domain",
+        "description": "Email outside allowed domains",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind@yahoo.com",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "email_uppercase",
+        "description": "Email with uppercase letters",
+        "payload": {
+            "name": "AravindMM",
+            "email": "ARAVIND.M@GNDSOLUTIONS.IN",
+            "phone": "9398634487"
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "invalid_phone_alpha",
+        "description": "Phone contains alphabets",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "93986ABCD"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "invalid_phone_special_chars",
+        "description": "Phone contains special characters",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "93986@#$%"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "invalid_phone_short",
+        "description": "Phone less than 10 digits",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "12345"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "invalid_phone_long",
+        "description": "Phone more than 10 digits",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "939863448700"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "phone_starts_with_0",
+        "description": "Phone starting with 0",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "0987654321"
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "phone_all_zeros",
+        "description": "Phone with all zeros",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "0000000000"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "payload_with_extra_fields",
+        "description": "Payload with unexpected fields",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487",
+            "age": 25,
+            "role": "ADMIN"
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "payload_null_values",
+        "description": "Fields with null values",
+        "payload": {
+            "name": null,
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "payload_incorrect_types",
+        "description": "Incorrect data types (integer for name)",
+        "payload": {
+            "name": 12345,
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "empty_string_name",
+        "description": "Empty string for name",
+        "payload": {
+            "name": "",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "empty_string_phone",
+        "description": "Empty string for phone",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": ""
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "empty_string_email",
+        "description": "Empty string for email",
+        "payload": {
+            "name": "AravindMM",
+            "email": "",
+            "phone": "9398634487"
+        },
+        "expected_status": 400
+    },
+    {
+        "name": "update_phone_only",
+        "description": "Updating only phone number (Dynamic)",
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "DYNAMIC_PHONE"
+        },
+        "expected_status": 200
+    },
+    {
+        "name": "unauthorized_no_token",
+        "description": "Missing authorization header",
+        "include_auth": false,
+        "payload": {
+            "name": "AravindMM",
+            "email": "aravind.m@gndsolutions.in",
+            "phone": "9398634487"
+        },
+        "expected_status": 401
+    }
+]

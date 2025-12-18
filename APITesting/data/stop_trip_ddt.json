@@ -1,0 +1,117 @@
+[
+  {
+    "name": "valid_stop_trip",
+    "description": "Valid stop-trip request should return 200",
+    "payload": {
+      "device_id": "TF60000052",
+      "trip_name": "eddv",
+      "end_time": 13234234
+    },
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "unknown_device_id",
+    "description": "Unknown device_id should be rejected",
+    "payload": {
+      "device_id": "UNKNOWN123",
+      "trip_name": "eddv",
+      "end_time": 13234234
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "unknown_trip_name",
+    "description": "Unknown trip_name for a valid device should be handled correctly",
+    "payload": {
+      "device_id": "TF60000052",
+      "trip_name": "non_existing_trip_name",
+      "end_time": 13234234
+    },
+    "include_auth": true,
+    "expected_status": 404
+  },
+  {
+    "name": "missing_device_id",
+    "description": "Missing device_id in body should be 400",
+    "payload": {
+      "trip_name": "eddv",
+      "end_time": 13234234
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "missing_trip_name",
+    "description": "Missing trip_name in body should be 400",
+    "payload": {
+      "device_id": "TF60000052",
+      "end_time": 13234234
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "missing_end_time",
+    "description": "Missing end_time in body should be 400",
+    "payload": {
+      "device_id": "TF60000052",
+      "trip_name": "eddv"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "invalid_end_time_type",
+    "description": "Non-numeric end_time should be rejected",
+    "payload": {
+      "device_id": "TF60000052",
+      "trip_name": "eddv",
+      "end_time": "not_a_timestamp"
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "negative_end_time",
+    "description": "Negative end_time should be rejected",
+    "payload": {
+      "device_id": "TF60000052",
+      "trip_name": "eddv",
+      "end_time": -12345
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "extra_field_in_payload",
+    "description": "Extra unknown field should be ignored or accepted",
+    "payload": {
+      "device_id": "TF60000052",
+      "trip_name": "eddv",
+      "end_time": 13234234,
+      "extra_field": "some_value"
+    },
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "empty_body",
+    "description": "Empty JSON body should be rejected",
+    "payload": {},
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "missing_authorization",
+    "description": "No Authorization header should return 401",
+    "payload": {
+      "device_id": "TF60000052",
+      "trip_name": "eddv",
+      "end_time": 13234234
+    },
+    "include_auth": false,
+    "expected_status": 401
+  }
+]

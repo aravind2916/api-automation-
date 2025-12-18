@@ -1,0 +1,117 @@
+[
+  {
+    "description": "Valid request - correct email & product",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "expected_status": 200
+  },
+  {
+    "description": "Valid request - env prod",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "query_params": {"env": "prod"},
+    "expected_status": 200
+  },
+  {
+    "description": "Valid request - env test",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "query_params": {"env": "test"},
+    "expected_status": 200
+  },
+
+  {
+    "description": "Invalid email format (missing @)",
+    "email": "aravind.m-gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "expected_status": 403
+  },
+  {
+    "description": "Empty email",
+    "email": "",
+    "product": "thinxfresh",
+    "method": "GET",
+    "expected_status": 500
+  },
+  {
+    "description": "Non-existing email",
+    "email": "unknown@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "expected_status": 403
+  },
+
+  {
+    "description": "Empty product",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "",
+    "method": "GET",
+    "expected_status": 500
+  },
+  {
+    "description": "Non-existing product name",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "unknownproduct",
+    "method": "GET",
+    "expected_status": 200
+  },
+  {
+    "description": "Product with special characters",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh@#$",
+    "method": "GET",
+    "expected_status": 500
+  },
+  {
+    "description": "Very long product name",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh-thinxfresh-thinxfresh-thinxfresh-thinxfresh",
+    "method": "GET",
+    "expected_status": 200
+  },
+
+  {
+    "description": "Missing Authorization header",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "headers": {},
+    "expected_status": 401
+  },
+  {
+    "description": "Invalid Authorization token",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "headers": {"Authorization": "Bearer invalid_token"},
+    "expected_status": 401
+  },
+
+  {
+    "description": "POST method instead of GET",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "POST",
+    "expected_status": 500
+  },
+  {
+    "description": "PUT method instead of GET",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "PUT",
+    "expected_status": 500
+  },
+
+  {
+    "description": "Unknown env value",
+    "email": "aravind.m@gndsolutions.in",
+    "product": "thinxfresh",
+    "method": "GET",
+    "query_params": {"env": "abc"},
+    "expected_status": 200
+  }
+]

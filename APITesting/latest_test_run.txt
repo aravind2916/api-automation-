@@ -1,0 +1,199 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.0.1, pluggy-1.6.0 -- C:\Users\AravindMaddineni\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.9', 'Platform': 'Windows-11-10.0.26200-SP0', 'Packages': {'pytest': '9.0.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'metadata': '3.1.1'}}
+rootdir: C:\Users\AravindMaddineni\Downloads\Apitest2 1\APITesting\APITesting
+configfile: pytest.ini
+plugins: html-4.1.1, metadata-3.1.1
+collecting ... collected 31 items
+
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_update_password_change_to_123] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_min_length_8chars] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_max_length_20chars] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[valid_mixed_complexity] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch_case] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch_trailing_space] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_new_password] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_confirm_password] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[empty_payload] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[empty_strings] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[null_values] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[short_password_1char] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[short_password_7chars] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[long_password_excessive] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_upper_case] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_lower_case] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_digit] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[missing_special_char] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[only_whitespace] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[leading_whitespace] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[trailing_whitespace] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[same_as_old_password] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[int_as_string_type_error] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[bool_as_string_type_error] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[sql_injection_attempt] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[xss_injection_attempt] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[unicode_characters] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[emoji_characters] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[control_characters] ERROR
+tests/test_update_password_ddt.py::test_update_password_ddt[no_auth_header] ERROR
+
+=================================== ERRORS ====================================
+_ ERROR at setup of test_update_password_ddt[valid_update_password_change_to_123] _
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_____ ERROR at setup of test_update_password_ddt[valid_min_length_8chars] _____
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+____ ERROR at setup of test_update_password_ddt[valid_max_length_20chars] _____
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_____ ERROR at setup of test_update_password_ddt[valid_mixed_complexity] ______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+________ ERROR at setup of test_update_password_ddt[password_mismatch] ________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_____ ERROR at setup of test_update_password_ddt[password_mismatch_case] ______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_ ERROR at setup of test_update_password_ddt[password_mismatch_trailing_space] _
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+______ ERROR at setup of test_update_password_ddt[missing_new_password] _______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+____ ERROR at setup of test_update_password_ddt[missing_confirm_password] _____
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+__________ ERROR at setup of test_update_password_ddt[empty_payload] __________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+__________ ERROR at setup of test_update_password_ddt[empty_strings] __________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+___________ ERROR at setup of test_update_password_ddt[null_values] ___________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+______ ERROR at setup of test_update_password_ddt[short_password_1char] _______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+______ ERROR at setup of test_update_password_ddt[short_password_7chars] ______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_____ ERROR at setup of test_update_password_ddt[long_password_excessive] _____
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_______ ERROR at setup of test_update_password_ddt[missing_upper_case] ________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_______ ERROR at setup of test_update_password_ddt[missing_lower_case] ________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+__________ ERROR at setup of test_update_password_ddt[missing_digit] __________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+______ ERROR at setup of test_update_password_ddt[missing_special_char] _______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_________ ERROR at setup of test_update_password_ddt[only_whitespace] _________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_______ ERROR at setup of test_update_password_ddt[leading_whitespace] ________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_______ ERROR at setup of test_update_password_ddt[trailing_whitespace] _______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+______ ERROR at setup of test_update_password_ddt[same_as_old_password] _______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+____ ERROR at setup of test_update_password_ddt[int_as_string_type_error] _____
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+____ ERROR at setup of test_update_password_ddt[bool_as_string_type_error] ____
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+______ ERROR at setup of test_update_password_ddt[sql_injection_attempt] ______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+______ ERROR at setup of test_update_password_ddt[xss_injection_attempt] ______
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_______ ERROR at setup of test_update_password_ddt[unicode_characters] ________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+________ ERROR at setup of test_update_password_ddt[emoji_characters] _________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_______ ERROR at setup of test_update_password_ddt[control_characters] ________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+_________ ERROR at setup of test_update_password_ddt[no_auth_header] __________
+conftest.py:24: in auth_token
+    raise RuntimeError(f"Login failed (subprocess): {data['error']}")
+E   RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+=========================== short test summary info ===========================
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[valid_update_password_change_to_123] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[valid_min_length_8chars] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[valid_max_length_20chars] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[valid_mixed_complexity] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch_case] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[password_mismatch_trailing_space] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_new_password] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_confirm_password] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[empty_payload] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[empty_strings] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[null_values] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[short_password_1char] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[short_password_7chars] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[long_password_excessive] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_upper_case] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_lower_case] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_digit] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[missing_special_char] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[only_whitespace] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[leading_whitespace] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[trailing_whitespace] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[same_as_old_password] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[int_as_string_type_error] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[bool_as_string_type_error] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[sql_injection_attempt] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[xss_injection_attempt] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[unicode_characters] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[emoji_characters] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[control_characters] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+ERROR tests/test_update_password_ddt.py::test_update_password_ddt[no_auth_header] - RuntimeError: Login failed (subprocess): Login failed: Status 400. Response: {"error": "Invalid password."}
+============================= 31 errors in 1.71s ==============================

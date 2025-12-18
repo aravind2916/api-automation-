@@ -1,0 +1,172 @@
+============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.0.1, pluggy-1.6.0 -- C:\Users\AravindMaddineni\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.9', 'Platform': 'Windows-11-10.0.26200-SP0', 'Packages': {'pytest': '9.0.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'metadata': '3.1.1'}}
+rootdir: C:\Users\AravindMaddineni\Downloads\Apitest2 1\APITesting\APITesting
+configfile: pytest.ini
+plugins: html-4.1.1, metadata-3.1.1
+collecting ... collected 10 items
+
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_valid_cases[MM/DD/YYYY + USER_LOCAL] DEBUG: Trying default password 'Aravind@123'...
+DEBUG: Status: 200, Body: {"message":"Date & time format updated successfully","data":{"email":"aravind.m@gndsolutions.in","date_display_format":"MM/DD/YYYY","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata"}}
+PASSED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_valid_cases[MM/DD/YYYY + GMT] DEBUG: Status: 200, Body: {"message":"Date & time format updated successfully","data":{"email":"aravind.m@gndsolutions.in","date_display_format":"MM/DD/YYYY","time_display_mode":"GMT","time_zone":"UTC"}}
+PASSED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_valid_cases[MM/DD/YYYY + EVENT_LOCAL] DEBUG: Status: 200, Body: {"message":"Date & time format updated successfully","data":{"email":"aravind.m@gndsolutions.in","date_display_format":"MM/DD/YYYY","time_display_mode":"EVENT_LOCAL","time_zone":"EVENT_LOCAL"}}
+PASSED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_valid_cases[DD/MM/YYYY + USER_LOCAL] DEBUG: Status: 200, Body: {"message":"Date & time format updated successfully","data":{"email":"aravind.m@gndsolutions.in","date_display_format":"DD/MM/YYYY","time_display_mode":"USER_LOCAL","time_zone":"Asia/Kolkata"}}
+PASSED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_valid_cases[YYYY/MM/DD + GMT] DEBUG: Status: 200, Body: {"message":"Date & time format updated successfully","data":{"email":"aravind.m@gndsolutions.in","date_display_format":"YYYY/MM/DD","time_display_mode":"GMT","time_zone":"UTC"}}
+PASSED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[Invalid date format] DEBUG: Status: 400, Body: {"message":"Invalid dateFormat. Allowed: MM/DD/YYYY, DD/MM/YYYY, YYYY/MM/DD","received":"DD-YY-MM","normalized":"DD/YY/MM"}
+PASSED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[Invalid time format] DEBUG: Status: 400, Body: {"message":"Invalid timeFormat. Allowed: USER_LOCAL, GMT, EVENT_LOCAL","received":"LOCAL","normalized":"LOCAL"}
+PASSED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[Invalid user identifier] DEBUG: Status: 403, Body: {"message":"You can change only your own date/time settings"}
+FAILED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[Unauthorized role] DEBUG: Status: 401, Body: {"msg":"refresh token expired , please login - Unexpected token i in JSON at position 1"}
+FAILED
+tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[User not found] DEBUG: Status: 403, Body: {"message":"You can change only your own date/time settings"}
+FAILED
+
+================================== FAILURES ===================================
+_____ test_update_datetime_format_invalid_cases[Invalid user identifier] ______
+
+case = {'expected_message': 'Invalid user identifier', 'expected_status': 403, 'payload': {'dateFormat': 'MM/DD/YYYY', 'timeFormat': 'GMT', 'timeZone': 'UTC'}, 'title': 'Invalid user identifier'}
+auth_token = '{"access": "vObihNErdYZaAFpl27f7Ec7hU27hei1nUrnF6FwotBYQ7O+qEgBcj6Zh0QnzANHrprgg4jvB+oXkib9VKu7pDTRadMq8xS535ouMgT75o...iEMCPXToSORTLVvc9V3PvlP3k7Brq8e4x8CmL4a+YjSOFoWPlhMpshzesfJnnfpGkFZhc6+9CvzCmLmC+hbkZjhVfFBa5msJgFyjQb8IAZ1uoFMhM0QC"}'
+
+    @pytest.mark.parametrize("case", TEST_DATA["invalid_cases"], ids=[c["title"] for c in TEST_DATA["invalid_cases"]])
+    def test_update_datetime_format_invalid_cases(case, auth_token):
+        # Default valid setup
+        target_endpoint = ENDPOINT
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {auth_token}"
+        }
+    
+        # Custom logic for specific failure scenarios
+        if case["title"] == "User not found":
+            fake_email = "unknown.user.999@test.com"
+            target_endpoint = f"{BASE_URL}/api/profile/{fake_email}/thinxfresh/update-date-time-format"
+    
+        if case["title"] == "Invalid user identifier":
+            # Simulate invalid format in URL
+            bad_email = "invalid-email-format-xyz"
+            target_endpoint = f"{BASE_URL}/api/profile/{bad_email}/thinxfresh/update-date-time-format"
+    
+        if case["title"] == "Unauthorized role":
+            headers["Authorization"] = "Bearer invalid_token_simulating_unauthorized"
+    
+        response = requests.put(
+            target_endpoint,
+            headers=headers,
+            json=case["payload"],
+            verify=False
+        )
+    
+        print(f"DEBUG: Status: {response.status_code}, Body: {response.text}")
+        assert response.status_code == case["expected_status"]
+    
+        response_json = response.json()
+        # Flexible strictness on message matching
+>       assert case["expected_message"] in response_json.get("message", "")
+E       AssertionError: assert 'Invalid user identifier' in 'You can change only your own date/time settings'
+E        +  where 'You can change only your own date/time settings' = <built-in method get of dict object at 0x000001FCACDE4880>('message', '')
+E        +    where <built-in method get of dict object at 0x000001FCACDE4880> = {'message': 'You can change only your own date/time settings'}.get
+
+tests\test_update_datetime_format_ddt.py:75: AssertionError
+________ test_update_datetime_format_invalid_cases[Unauthorized role] _________
+
+case = {'expected_message': 'Only ADMIN users can change date/time settings', 'expected_status': 403, 'payload': {'dateFormat': 'DD/MM/YYYY', 'timeFormat': 'USER_LOCAL', 'timeZone': 'Asia/Kolkata'}, 'title': 'Unauthorized role'}
+auth_token = '{"access": "vObihNErdYZaAFpl27f7Ec7hU27hei1nUrnF6FwotBYQ7O+qEgBcj6Zh0QnzANHrprgg4jvB+oXkib9VKu7pDTRadMq8xS535ouMgT75o...iEMCPXToSORTLVvc9V3PvlP3k7Brq8e4x8CmL4a+YjSOFoWPlhMpshzesfJnnfpGkFZhc6+9CvzCmLmC+hbkZjhVfFBa5msJgFyjQb8IAZ1uoFMhM0QC"}'
+
+    @pytest.mark.parametrize("case", TEST_DATA["invalid_cases"], ids=[c["title"] for c in TEST_DATA["invalid_cases"]])
+    def test_update_datetime_format_invalid_cases(case, auth_token):
+        # Default valid setup
+        target_endpoint = ENDPOINT
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {auth_token}"
+        }
+    
+        # Custom logic for specific failure scenarios
+        if case["title"] == "User not found":
+            fake_email = "unknown.user.999@test.com"
+            target_endpoint = f"{BASE_URL}/api/profile/{fake_email}/thinxfresh/update-date-time-format"
+    
+        if case["title"] == "Invalid user identifier":
+            # Simulate invalid format in URL
+            bad_email = "invalid-email-format-xyz"
+            target_endpoint = f"{BASE_URL}/api/profile/{bad_email}/thinxfresh/update-date-time-format"
+    
+        if case["title"] == "Unauthorized role":
+            headers["Authorization"] = "Bearer invalid_token_simulating_unauthorized"
+    
+        response = requests.put(
+            target_endpoint,
+            headers=headers,
+            json=case["payload"],
+            verify=False
+        )
+    
+        print(f"DEBUG: Status: {response.status_code}, Body: {response.text}")
+>       assert response.status_code == case["expected_status"]
+E       assert 401 == 403
+E        +  where 401 = <Response [401]>.status_code
+
+tests\test_update_datetime_format_ddt.py:71: AssertionError
+__________ test_update_datetime_format_invalid_cases[User not found] __________
+
+case = {'expected_message': 'User not found', 'expected_status': 403, 'payload': {'dateFormat': 'YYYY/MM/DD', 'timeFormat': 'GMT', 'timeZone': 'UTC'}, 'title': 'User not found'}
+auth_token = '{"access": "vObihNErdYZaAFpl27f7Ec7hU27hei1nUrnF6FwotBYQ7O+qEgBcj6Zh0QnzANHrprgg4jvB+oXkib9VKu7pDTRadMq8xS535ouMgT75o...iEMCPXToSORTLVvc9V3PvlP3k7Brq8e4x8CmL4a+YjSOFoWPlhMpshzesfJnnfpGkFZhc6+9CvzCmLmC+hbkZjhVfFBa5msJgFyjQb8IAZ1uoFMhM0QC"}'
+
+    @pytest.mark.parametrize("case", TEST_DATA["invalid_cases"], ids=[c["title"] for c in TEST_DATA["invalid_cases"]])
+    def test_update_datetime_format_invalid_cases(case, auth_token):
+        # Default valid setup
+        target_endpoint = ENDPOINT
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {auth_token}"
+        }
+    
+        # Custom logic for specific failure scenarios
+        if case["title"] == "User not found":
+            fake_email = "unknown.user.999@test.com"
+            target_endpoint = f"{BASE_URL}/api/profile/{fake_email}/thinxfresh/update-date-time-format"
+    
+        if case["title"] == "Invalid user identifier":
+            # Simulate invalid format in URL
+            bad_email = "invalid-email-format-xyz"
+            target_endpoint = f"{BASE_URL}/api/profile/{bad_email}/thinxfresh/update-date-time-format"
+    
+        if case["title"] == "Unauthorized role":
+            headers["Authorization"] = "Bearer invalid_token_simulating_unauthorized"
+    
+        response = requests.put(
+            target_endpoint,
+            headers=headers,
+            json=case["payload"],
+            verify=False
+        )
+    
+        print(f"DEBUG: Status: {response.status_code}, Body: {response.text}")
+        assert response.status_code == case["expected_status"]
+    
+        response_json = response.json()
+        # Flexible strictness on message matching
+>       assert case["expected_message"] in response_json.get("message", "")
+E       AssertionError: assert 'User not found' in 'You can change only your own date/time settings'
+E        +  where 'You can change only your own date/time settings' = <built-in method get of dict object at 0x000001FCACE5E8C0>('message', '')
+E        +    where <built-in method get of dict object at 0x000001FCACE5E8C0> = {'message': 'You can change only your own date/time settings'}.get
+
+tests\test_update_datetime_format_ddt.py:75: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[Invalid user identifier] - AssertionError: assert 'Invalid user identifier' in 'You can change only your own date/time settings'
+ +  where 'You can change only your own date/time settings' = <built-in method get of dict object at 0x000001FCACDE4880>('message', '')
+ +    where <built-in method get of dict object at 0x000001FCACDE4880> = {'message': 'You can change only your own date/time settings'}.get
+FAILED tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[Unauthorized role] - assert 401 == 403
+ +  where 401 = <Response [401]>.status_code
+FAILED tests/test_update_datetime_format_ddt.py::test_update_datetime_format_invalid_cases[User not found] - AssertionError: assert 'User not found' in 'You can change only your own date/time settings'
+ +  where 'You can change only your own date/time settings' = <built-in method get of dict object at 0x000001FCACE5E8C0>('message', '')
+ +    where <built-in method get of dict object at 0x000001FCACE5E8C0> = {'message': 'You can change only your own date/time settings'}.get
+========================= 3 failed, 7 passed in 2.67s =========================

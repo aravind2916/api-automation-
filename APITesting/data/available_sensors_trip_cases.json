@@ -1,0 +1,14 @@
+[
+  {
+    "name": "valid_available_sensors_trip",
+    "description": "Authorized request should return list of available sensors for trip",
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "unauthorized_request",
+    "description": "Missing auth header still returns data (endpoint is public)",
+    "include_auth": false,
+    "expected_status": 200
+  }
+]

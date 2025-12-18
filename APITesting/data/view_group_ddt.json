@@ -1,0 +1,18 @@
+[
+  {
+    "name": "valid_existing_group_page1",
+    "description": "Valid group ID, page=1, per_page=4",
+    "group_id": "692ec0f4d4c4cec087422ea9",
+    "query_params": {
+      "page": 1,
+      "per_page": 4
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_group_details": true,
+    "expect_device_list": true,
+    "expect_empty_device_list": false,
+    "validate_group_details": true,
+    "validate_pagination": true
+  }
+]

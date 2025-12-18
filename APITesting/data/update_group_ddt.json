@@ -1,0 +1,90 @@
+[
+  {
+    "name": "valid_update_name_and_description",
+    "description": "Valid group_id, change name and description (but name already exists -> 409)",
+    "group_id": "692ec0f4d4c4cec087422ea9",
+    "payload": {
+      "name": "99999999999990",
+      "description": "test-new"
+    },
+    "expected_status": 409,
+    "expect_success_msg": false,
+    "expect_error_contains": "already exists",
+    "include_auth": true
+  },
+  {
+    "name": "update_only_description",
+    "description": "Update only description (missing name -> 400)",
+    "group_id": "692ec0f4d4c4cec087422ea9",
+    "payload": {
+      "description": "description-only-update"
+    },
+    "expected_status": 400,
+    "expect_success_msg": false,
+    "expect_error_contains": "Name and description are required",
+    "include_auth": true
+  },
+  {
+    "name": "update_only_name",
+    "description": "Update only name (missing description -> 400)",
+    "group_id": "692ec0f4d4c4cec087422ea9",
+    "payload": {
+      "name": "GroupNameOnlyUpdate"
+    },
+    "expected_status": 400,
+    "expect_success_msg": false,
+    "expect_error_contains": "Name and description are required",
+    "include_auth": true
+  },
+  {
+    "name": "invalid_group_id",
+    "description": "Non existing group id",
+    "group_id": "000000000000000000000000",
+    "payload": {
+      "name": "any",
+      "description": "fail test"
+    },
+    "expected_status": 404,
+    "expect_success_msg": false,
+    "expect_error_contains": "Group not found",
+    "include_auth": true
+  },
+  {
+    "name": "missing_group_id",
+    "description": "Group ID param missing -> 404",
+    "group_id": null,
+    "payload": {
+      "name": "no-group",
+      "description": "fail"
+    },
+    "expected_status": 404,
+    "expect_success_msg": false,
+    "expect_error_contains": "Group not found",
+    "include_auth": true
+  },
+  {
+    "name": "empty_name",
+    "description": "Empty name should fail",
+    "group_id": "692ec0f4d4c4cec087422ea9",
+    "payload": {
+      "name": "",
+      "description": "empty"
+    },
+    "expected_status": 400,
+    "expect_success_msg": false,
+    "expect_error_contains": "Name and description are required",
+    "include_auth": true
+  },
+  {
+    "name": "unauthorized_no_auth",
+    "description": "No Authorization header",
+    "group_id": "692ec0f4d4c4cec087422ea9",
+    "payload": {
+      "name": "anything",
+      "description": "anything"
+    },
+    "expected_status": 401,
+    "expect_success_msg": false,
+    "include_auth": false
+  }
+]

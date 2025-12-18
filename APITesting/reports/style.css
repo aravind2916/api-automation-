@@ -1,0 +1,97 @@
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e0e0e0;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    color: #00fff2;
+    text-shadow: 0 0 10px rgba(0, 255, 242, 0.5);
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+#results-table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    width: 100%;
+}
+
+#results-table thead th {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffd700;
+    padding: 15px;
+    border: none;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.results-table-row {
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-radius: 8px;
+}
+
+.results-table-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.results-table-row td {
+    padding: 15px;
+    border: none;
+}
+
+.col-result {
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.passed {
+    color: #00ff88 !important;
+    text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+}
+
+.failed {
+    color: #ff3860 !important;
+    text-shadow: 0 0 8px rgba(255, 56, 96, 0.4);
+}
+
+.error {
+    color: #ffdd57 !important;
+    text-shadow: 0 0 8px rgba(255, 221, 87, 0.4);
+}
+
+.summary-suite {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+a {
+    color: #4da6ff;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover {
+    color: #80bfff;
+    text-decoration: underline;
+}
+
+.log {
+    background-color: #0f0f1a;
+    color: #00ff41;
+    font-family: 'Consolas', monospace;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 3px solid #00ff41;
+}

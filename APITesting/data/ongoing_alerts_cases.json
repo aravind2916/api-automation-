@@ -1,0 +1,28 @@
+[
+  {
+    "name": "valid_ongoing_alerts",
+    "description": "Authorized request should return ongoing alerts list",
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "unauthorized_request",
+    "description": "Missing auth should return 401",
+    "include_auth": false,
+    "expected_status": 401
+  },
+  {
+    "name": "invalid_method",
+    "description": "Wrong HTTP method should return 405 (once auth works)",
+    "include_auth": true,
+    "method": "POST",
+    "expected_status": 405
+  },
+  {
+    "name": "invalid_query_params",
+    "description": "Invalid params should return 400 (once auth works)",
+    "include_auth": true,
+    "url_override": "?order=wrong&per_page=0&page=-1",
+    "expected_status": 400
+  }
+]

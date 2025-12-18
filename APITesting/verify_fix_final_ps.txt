@@ -1,0 +1,58 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.13.9, pytest-9.0.1, pluggy-1.6.0 -- C:\Users\AravindMaddineni\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\python.exe
+cachedir: .pytest_cache
+metadata: {'Python': '3.13.9', 'Platform': 'Windows-11-10.0.26200-SP0', 'Packages': {'pytest': '9.0.1', 'pluggy': '1.6.0'}, 'Plugins': {'html': '4.1.1', 'metadata': '3.1.1'}}
+rootdir: C:\Users\AravindMaddineni\Downloads\Apitest2 1\APITesting\APITesting
+configfile: pytest.ini
+plugins: html-4.1.1, metadata-3.1.1
+collecting ... collected 30 items / 29 deselected / 1 selected
+
+tests/test_update_profile_ddt.py::test_update_profile_ddt[no_changes_detected] DEBUG: Trying default password 'Aravind@123'...
+DEBUG: Pre-fetching profile to ensure NO CHANGES...
+FAILED
+
+================================== FAILURES ===================================
+________________ test_update_profile_ddt[no_changes_detected] _________________
+
+case = {'description': 'Same name, email and phone', 'expected_status': 400, 'name': 'no_changes_detected', 'payload': {'email': 'aravind.m@gndsolutions.in', 'name': 'AravindMM', 'phone': '9398634487'}}
+auth_token = '{"access": "mH+i5Nmhlge1GB7ndxyH6CYLiPGP8wSwz6Wz+oXAdTLLSLx6tBHEkivgbrl40AJOaPKmv3q/6PabuuFdYpi9poD0mVsw1nH7i5i4g0XsY...xNo5ncuyvfTh5Vtf7MtZqc5GsRmwYe4NOe8Iv+9HqT24eCKvQOnoNaWVt0S39CG7EggFBlKGoAKewwGcOcc1SZSCUTiU2CiP3I7EO+WyTrjSk0sR1Q=="}'
+
+    @pytest.mark.parametrize("case", TEST_CASES, ids=[c["name"] for c in TEST_CASES])
+    def test_update_profile_ddt(case, auth_token):
+    
+        # deepcopy to avoid modifying the original test data across iterations
+        payload = copy.deepcopy(case["payload"])
+    
+        # Handle Dynamic Data Generation
+        if payload.get("name") == "DYNAMIC_NAME":
+            random_suffix = ''.join(random.choices(string.ascii_uppercase, k=4))
+            payload["name"] = f"Aravind{random_suffix}"
+    
+        if payload.get("phone") == "DYNAMIC_PHONE":
+             # Generate random 10 digit number starting with 9
+            random_digits = ''.join(random.choices(string.digits, k=9))
+            payload["phone"] = f"9{random_digits}"
+    
+        headers = {"Content-Type": "application/json"}
+        if case.get("include_auth", True):
+            headers["Authorization"] = f"Bearer {auth_token}"
+    
+        import time
+        # SPECIAL HANDLING: For "no_changes_detected", we must ensure the payload MATCHES the DB exactly.
+        if case["name"] == "no_changes_detected":
+            time.sleep(1) # Wait for previous writes to settle
+            print("DEBUG: Pre-fetching profile to ensure NO CHANGES...")
+            get_r = requests.get(UPDATE_PROFILE_URL, headers=headers, verify=False)
+    
+            # FAIL if we can't get current state
+>           assert get_r.status_code == 200, f"Setup Failed: Could not fetch profile. Status {get_r.status_code}"
+E           AssertionError: Setup Failed: Could not fetch profile. Status 404
+E           assert 404 == 200
+E            +  where 404 = <Response [404]>.status_code
+
+tests\test_update_profile_ddt.py:51: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_update_profile_ddt.py::test_update_profile_ddt[no_changes_detected] - AssertionError: Setup Failed: Could not fetch profile. Status 404
+assert 404 == 200
+ +  where 404 = <Response [404]>.status_code
+====================== 1 failed, 29 deselected in 1.78s =======================

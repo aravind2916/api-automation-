@@ -1,0 +1,2350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThinxView API Book</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --sidebar-bg: #1e293b;
+            --text-gold: #fbbf24;
+            --text-light: #e2e8f0;
+            --text-dim: #94a3b8;
+            --card-bg: #1e293b;
+            --accent-blue: #3b82f6;
+            --success: #10b981;
+            --error: #ef4444;
+            --border: #334155;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar - The "Book Spine" */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+
+        .brand {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--text-gold);
+            margin: 0;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+        }
+
+        .brand .subtitle {
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .nav-stats {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-light);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+
+        .is-passed .stat-val {
+            color: var(--success);
+        }
+
+        .is-failed .stat-val {
+            color: var(--error);
+        }
+
+        .chapter-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+
+        .chapter-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chapter-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .chapter-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            border-left-color: var(--text-gold);
+        }
+
+        .chapter-item.status-failed {
+            color: var(--error);
+        }
+
+        .chapter-item.status-passed {
+            color: var(--text-dim);
+        }
+
+        .chapter-item.active.status-passed {
+            color: var(--text-light);
+        }
+
+        .search-box {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 4px;
+            color: var(--text-light);
+            outline: none;
+        }
+
+        /* Main Content - The "Page" */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background: linear-gradient(135deg, #0f172a 0%, #172033 100%);
+        }
+
+        .page-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: none;
+            /* Hidden by default */
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page-container.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 20px;
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--text-gold);
+            margin: 0 0 10px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-pass {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .badge-fail {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .section h3 {
+            margin-top: 0;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .key-value-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .kv-item label {
+            display: block;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+        }
+
+        .kv-item div {
+            font-family: 'Courier New', monospace;
+            color: var(--accent-blue);
+        }
+
+        .log-box {
+            background: #000;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #d4d4d4;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        /* Dashboard Overview Page */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .kpi-big {
+            grid-column: span 2;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .chart-container {
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Simple Donut Chart CSS */
+        .donut {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+
+            background: conic-gradient(var(--success) 0% {
+                        {
+                        passed_percent
+                    }
+                }
+
+                %, var(--error) {
+                        {
+                        passed_percent
+                    }
+                }
+
+                % 100%);
+            position: relative;
+        }
+
+        .donut::after {
+            content: "100%";
+            position: absolute;
+            inset: 20px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="brand">
+            <h1>ThinxView</h1>
+            <div class="subtitle">API Test Book</div>
+        </div>
+
+        <div class="nav-stats">
+            <div class="stat-card">
+                <div class="stat-val">31</div>
+                <div class="stat-label">Tests</div>
+            </div>
+            <div class="stat-card is-failed">
+                <div class="stat-val">0</div>
+                <div class="stat-label">Failed</div>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search chapters..."
+                onkeyup="filterChapters(this.value)">
+        </div>
+
+        <div class="chapter-list" id="chapterList">
+            <div class="chapter-item active" onclick="showPage('dashboard')">
+                <span>📘 Executive Summary</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-1')">
+                <span>same_as_old_password_explicit</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-2')">
+                <span>valid_min_length_8chars</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-3')">
+                <span>valid_max_length_20chars</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-4')">
+                <span>valid_mixed_complexity</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-5')">
+                <span>password_mismatch</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-6')">
+                <span>password_mismatch_case</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-7')">
+                <span>password_mismatch_trailing_space</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-8')">
+                <span>missing_new_password</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-9')">
+                <span>missing_confirm_password</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-10')">
+                <span>empty_payload</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-11')">
+                <span>empty_strings</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-12')">
+                <span>null_values</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-13')">
+                <span>short_password_1char</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-14')">
+                <span>short_password_7chars</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-15')">
+                <span>long_password_excessive</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-16')">
+                <span>missing_upper_case</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-17')">
+                <span>missing_lower_case</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-18')">
+                <span>missing_digit</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-19')">
+                <span>missing_special_char</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-20')">
+                <span>only_whitespace</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-21')">
+                <span>leading_whitespace</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-22')">
+                <span>trailing_whitespace</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-23')">
+                <span>same_as_old_password</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-24')">
+                <span>int_as_string_type_error</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-25')">
+                <span>bool_as_string_type_error</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-26')">
+                <span>sql_injection_attempt</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-27')">
+                <span>xss_injection_attempt</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-28')">
+                <span>unicode_characters</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-29')">
+                <span>emoji_characters</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-30')">
+                <span>control_characters</span>
+                <span>✔</span>
+            </div>
+            
+            <div class="chapter-item status-passed" onclick="showPage('test-31')">
+                <span>no_auth_header</span>
+                <span>✔</span>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- DASHBOARD PAGE -->
+        <div id="dashboard" class="page-container active">
+            <div class="page-header">
+                <h2 class="page-title">Executive Summary</h2>
+                <div class="badge badge-pass" style="background: transparent; padding: 0; color: var(--text-dim);">
+                    Generated on 2025-12-17 10:19:07
+                </div>
+            </div>
+
+            <div class="section kpi-big">
+                <div style="font-size: 4rem; font-weight: 700; color: #10b981;">
+                    100%
+                </div>
+                <div style="text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim);">Pass Rate</div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="section">
+                    <h3>Distribution</h3>
+                    <div class="chart-container">
+                        <div class="donut"></div>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>Execution Stats</h3>
+                    <div class="key-value-grid">
+                        <div class="kv-item"><label>Duration</label>
+                            <div>8.68s</div>
+                        </div>
+                        <div class="kv-item"><label>Total</label>
+                            <div>31</div>
+                        </div>
+                        <div class="kv-item"><label>Passed</label>
+                            <div style="color: var(--success)">31</div>
+                        </div>
+                        <div class="kv-item"><label>Failed</label>
+                            <div style="color: var(--error)">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEST PAGES -->
+        
+        <div id="test-1" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[same_as_old_password_explicit]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">2.537s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Aravind@123",
+  "confirmPassword": "Aravind@123"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[same_as_old_password_explicit]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-2" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[valid_min_length_8chars]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.575s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>200</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Aravind@12345",
+  "confirmPassword": "Aravind@12345"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[valid_min_length_8chars]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-3" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[valid_max_length_20chars]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.449s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>200</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "LongPassword123!@#$%",
+  "confirmPassword": "LongPassword123!@#$%"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[valid_max_length_20chars]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-4" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[valid_mixed_complexity]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.598s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>200</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "ThinxView@2025",
+  "confirmPassword": "ThinxView@2025"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[valid_mixed_complexity]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-5" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[password_mismatch]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.119s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Aravind@1234",
+  "confirmPassword": "Wrong@1234"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[password_mismatch]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-6" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[password_mismatch_case]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.145s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Password123!",
+  "confirmPassword": "password123!"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[password_mismatch_case]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-7" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[password_mismatch_trailing_space]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.172s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Password123!",
+  "confirmPassword": "Password123! "
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[password_mismatch_trailing_space]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-8" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[missing_new_password]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.169s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "confirmPassword": "Aravind@1234"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[missing_new_password]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-9" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[missing_confirm_password]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.164s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Aravind@1234"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[missing_confirm_password]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-10" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[empty_payload]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.136s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[empty_payload]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-11" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[empty_strings]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.147s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "",
+  "confirmPassword": ""
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[empty_strings]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-12" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[null_values]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.144s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": null,
+  "confirmPassword": null
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[null_values]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-13" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[short_password_1char]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.152s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "a",
+  "confirmPassword": "a"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[short_password_1char]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-14" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[short_password_7chars]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.173s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Short1!",
+  "confirmPassword": "Short1!"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[short_password_7chars]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-15" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[long_password_excessive]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.188s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "ThisPasswordIsWayTooLongAndShouldLikelyBeRejectedByTheServerBecauseItExceedsReasonableLimitsForAPasswordFieldAndCouldCauseIssuesIfStoredDirectlyOrHashedInefficiently123!",
+  "confirmPassword": "ThisPasswordIsWayTooLongAndShouldLikelyBeRejectedByTheServerBecauseItExceedsReasonableLimitsForAPasswordFieldAndCouldCauseIssuesIfStoredDirectlyOrHashedInefficiently123!"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[long_password_excessive]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-16" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[missing_upper_case]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.150s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "password123!",
+  "confirmPassword": "password123!"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[missing_upper_case]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-17" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[missing_lower_case]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.159s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "PASSWORD123!",
+  "confirmPassword": "PASSWORD123!"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[missing_lower_case]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-18" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[missing_digit]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.137s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Password!@#",
+  "confirmPassword": "Password!@#"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[missing_digit]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-19" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[missing_special_char]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.148s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Password123",
+  "confirmPassword": "Password123"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[missing_special_char]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-20" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[only_whitespace]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.199s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "        ",
+  "confirmPassword": "        "
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[only_whitespace]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-21" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[leading_whitespace]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.144s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": " Password123!",
+  "confirmPassword": " Password123!"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[leading_whitespace]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-22" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[trailing_whitespace]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.160s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Password123! ",
+  "confirmPassword": "Password123! "
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[trailing_whitespace]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-23" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[same_as_old_password]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.117s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "3a640839e1ccd43a2b13d53da9c99774d1913aa498ab97201ddc90c9a3e31b0c",
+  "confirmPassword": "3a640839e1ccd43a2b13d53da9c99774d1913aa498ab97201ddc90c9a3e31b0c"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[same_as_old_password]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-24" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[int_as_string_type_error]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.138s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": 12345678,
+  "confirmPassword": 12345678
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[int_as_string_type_error]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-25" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[bool_as_string_type_error]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.145s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": true,
+  "confirmPassword": true
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[bool_as_string_type_error]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-26" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[sql_injection_attempt]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.149s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "' OR '1'='1",
+  "confirmPassword": "' OR '1'='1"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[sql_injection_attempt]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-27" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[xss_injection_attempt]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.140s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "<script>alert(1)</script>",
+  "confirmPassword": "<script>alert(1)</script>"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[xss_injection_attempt]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-28" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[unicode_characters]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.394s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>200</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "P@ssw\u00f8rd123",
+  "confirmPassword": "P@ssw\u00f8rd123"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[unicode_characters]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-29" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[emoji_characters]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.172s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Password\ud83d\udd11123",
+  "confirmPassword": "Password\ud83d\udd11123"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[emoji_characters]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-30" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[control_characters]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.160s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>400</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Pass\nword123",
+  "confirmPassword": "Pass\nword123"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[control_characters]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+        <div id="test-31" class="page-container">
+            <div class="page-header">
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                    <div>
+                        <div class="badge badge-pass">
+                            passed
+                        </div>
+                        <h2 class="page-title" style="margin-top: 10px; font-size: 1.5rem;">
+                            test_update_password_ddt[no_auth_header]
+                        </h2>
+                    </div>
+                    <div style="color: var(--text-dim); font-family: monospace;">0.158s</div>
+                </div>
+            </div>
+
+            <!-- Test Data Section -->
+            
+            <div class="section">
+                <h3>Test Case Data</h3>
+                <div class="key-value-grid">
+                    
+                    <div class="kv-item"><label>Expected Status</label>
+                        <div>401</div>
+                    </div>
+                    
+                </div>
+                
+                <div style="margin-top: 15px;">
+                    <label style="color: var(--text-dim); font-size: 0.8rem;">Request Payload</label>
+                    <div class="log-box" style="margin-top: 5px; color: #a5b4fc;">{
+  "newPassword": "Aravind@1234",
+  "confirmPassword": "Aravind@1234"
+}</div>
+                </div>
+                
+            </div>
+            
+
+            <div class="section">
+                <h3>Test Details</h3>
+                <div class="key-value-grid">
+                    <div class="kv-item"><label>Node ID</label>
+                        <div>tests.test_update_password_ddt::test_update_password_ddt[no_auth_header]</div>
+                    </div>
+                    <div class="kv-item"><label>Location</label>
+                        <div>None:None</div>
+                    </div>
+                </div>
+            </div>
+
+            
+
+            
+
+            
+        </div>
+        
+
+    </div>
+
+    <script>
+        function showPage(id) {
+            // Hide all pages
+            document.querySelectorAll('.page-container').forEach(el => el.classList.remove('active'));
+            // Show selected
+            document.getElementById(id).classList.add('active');
+
+            // Update sidebar active state
+            document.querySelectorAll('.chapter-item').forEach(el => el.classList.remove('active'));
+            // Find the clicked item (this is a bit hacky but works for this simple structure)
+            const clicked = Array.from(document.querySelectorAll('.chapter-item')).find(el => el.getAttribute('onclick').includes(id));
+            if (clicked) clicked.classList.add('active');
+        }
+
+        function filterChapters(text) {
+            text = text.toLowerCase();
+            document.querySelectorAll('.chapter-item').forEach(el => {
+                const content = el.innerText.toLowerCase();
+                el.style.display = content.includes(text) || el.getAttribute('onclick').includes('dashboard') ? 'flex' : 'none';
+            });
+        }
+    </script>
+</body>
+
+</html>

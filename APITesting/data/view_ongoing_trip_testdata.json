@@ -1,0 +1,108 @@
+[
+  {
+    "name": "valid_trip_for_sensor",
+    "description": "Valid request for an ongoing trip for given sensor and name",
+    "sensor_id": "TF60000085",
+    "query_params": {
+      "name": "dcdsc"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_data": true,
+    "validate_history": true,
+    "validate_logs": true,
+    "check_current_config_range": true
+  },
+  {
+    "name": "valid_without_name_filter",
+    "description": "No name filter, expect trips for the sensor if any exist",
+    "sensor_id": "TF60000085",
+    "query_params": {},
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_data": true
+  },
+  {
+    "name": "missing_authorization",
+    "description": "No Authorization header, should be unauthorized",
+    "sensor_id": "TF60000085",
+    "query_params": {
+      "name": "dcdsc"
+    },
+    "include_auth": false,
+    "expected_status": 401
+  },
+  {
+    "name": "invalid_sensor_id",
+    "description": "Unknown sensorId should return 4xx or 200 with empty data",
+    "sensor_id": "INVALID_SENSOR_999",
+    "query_params": {
+      "name": "dcdsc"
+    },
+    "include_auth": true,
+    "expected_status": 404,
+    "allow_empty_data_on_404": true
+  },
+  {
+    "name": "mismatched_trip_name",
+    "description": "Trip name does not match any ongoing trip for the given sensor",
+    "sensor_id": "TF60000085",
+    "query_params": {
+      "name": "random_non_existing_name"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_empty_data": true
+  },
+  {
+    "name": "empty_name_param",
+    "description": "Empty 'name' query param, backend may treat it as invalid",
+    "sensor_id": "TF60000085",
+    "query_params": {
+      "name": ""
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "missing_name_param",
+    "description": "No 'name' query param sent at all",
+    "sensor_id": "TF60000085",
+    "query_params": {},
+    "include_auth": true,
+    "expected_status": 200
+  },
+  {
+    "name": "invalid_name_type",
+    "description": "Name param has wrong type (number instead of string)",
+    "sensor_id": "TF60000085",
+    "query_params": {
+      "name": 12345
+    },
+    "include_auth": true,
+    "expected_status": 400
+  },
+  {
+    "name": "sensor_id_lowercase",
+    "description": "Check if sensorId is case-sensitive or not",
+    "sensor_id": "tf60000085",
+    "query_params": {
+      "name": "dcdsc"
+    },
+    "include_auth": true,
+    "expected_status": 404
+  },
+  {
+    "name": "expect_non_empty_history_and_logs",
+    "description": "Ensure tripHistory and tripLogs are populated for active trip",
+    "sensor_id": "TF60000085",
+    "query_params": {
+      "name": "dcdsc"
+    },
+    "include_auth": true,
+    "expected_status": 200,
+    "expect_data": true,
+    "require_non_empty_history": true,
+    "require_non_empty_logs": true
+  }
+]

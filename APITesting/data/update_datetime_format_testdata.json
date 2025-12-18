@@ -1,0 +1,325 @@
+{
+    "valid_cases": [
+        {
+            "title": "MM/DD/YYYY + USER_LOCAL + Asia/Kolkata",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "MM/DD/YYYY + GMT + UTC",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": "UTC"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "MM/DD/YYYY + EVENT_LOCAL + EVENT_LOCAL",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "EVENT_LOCAL",
+                "timeZone": "EVENT_LOCAL"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "DD/MM/YYYY + USER_LOCAL + Asia/Kolkata",
+            "payload": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "YYYY/MM/DD + GMT + UTC",
+            "payload": {
+                "dateFormat": "YYYY/MM/DD",
+                "timeFormat": "GMT",
+                "timeZone": "UTC"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "DD/MM/YYYY + GMT + Europe/London",
+            "payload": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": "Europe/London"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "YYYY/MM/DD + USER_LOCAL + America/New_York",
+            "payload": {
+                "dateFormat": "YYYY/MM/DD",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "America/New_York"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "MM/DD/YYYY + EVENT_LOCAL + Australia/Sydney",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "EVENT_LOCAL",
+                "timeZone": "Australia/Sydney"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "DD/MM/YYYY + EVENT_LOCAL + Asia/Tokyo",
+            "payload": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "EVENT_LOCAL",
+                "timeZone": "Asia/Tokyo"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "YYYY/MM/DD + EVENT_LOCAL + Europe/Paris",
+            "payload": {
+                "dateFormat": "YYYY/MM/DD",
+                "timeFormat": "EVENT_LOCAL",
+                "timeZone": "Europe/Paris"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "MM/DD/YYYY + USER_LOCAL + UTC",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "UTC"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "DD/MM/YYYY + GMT + Asia/Kolkata",
+            "payload": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "YYYY/MM/DD + USER_LOCAL + Pacific/Honolulu",
+            "payload": {
+                "dateFormat": "YYYY/MM/DD",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Pacific/Honolulu"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "DD/MM/YYYY + EVENT_LOCAL + America/Los_Angeles",
+            "payload": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "EVENT_LOCAL",
+                "timeZone": "America/Los_Angeles"
+            },
+            "expected_status": 200
+        },
+        {
+            "title": "MM/DD/YYYY + GMT + Africa/Cairo",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": "Africa/Cairo"
+            },
+            "expected_status": 200
+        }
+    ],
+    "invalid_cases": [
+        {
+            "title": "Invalid date format - Dashes",
+            "payload": {
+                "dateFormat": "DD-YY-MM",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid dateFormat"
+        },
+        {
+            "title": "Invalid date format - Special Chars",
+            "payload": {
+                "dateFormat": "MM@DD$YYYY",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid dateFormat"
+        },
+        {
+            "title": "Invalid date format - Empty",
+            "payload": {
+                "dateFormat": "",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid dateFormat"
+        },
+        {
+            "title": "Invalid date format - Long String",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY/YYYY/YYYY/YYYY",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid dateFormat"
+        },
+        {
+            "title": "Invalid time format - Random",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid timeFormat"
+        },
+        {
+            "title": "Invalid time format - Lowercase",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "user_local",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid timeFormat"
+        },
+        {
+            "title": "Invalid time format - Empty",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid timeFormat"
+        },
+        {
+            "title": "Invalid TimeZone - Unknown ID",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": "Mars/Phobos"
+            },
+            "expected_status": 400,
+            "expected_message": ""
+        },
+        {
+            "title": "Invalid TimeZone - Numeric",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": "12345"
+            },
+            "expected_status": 400,
+            "expected_message": ""
+        },
+        {
+            "title": "Invalid TimeZone - Empty",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": ""
+            },
+            "expected_status": 400,
+            "expected_message": ""
+        },
+        {
+            "title": "Missing dateFormat",
+            "payload": {
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": ""
+        },
+        {
+            "title": "Missing timeFormat",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": ""
+        },
+        {
+            "title": "Missing timeZone",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "USER_LOCAL"
+            },
+            "expected_status": 400,
+            "expected_message": ""
+        },
+        {
+            "title": "Empty Payload",
+            "payload": {},
+            "expected_status": 400,
+            "expected_message": ""
+        },
+        {
+            "title": "Extra Fields",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata",
+                "extra": "field"
+            },
+            "expected_status": 200,
+            "expected_message": "Date & time format updated successfully"
+        },
+        {
+            "title": "SQL Injection Probe Date",
+            "payload": {
+                "dateFormat": "' OR 1=1 --",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 400,
+            "expected_message": "Invalid dateFormat"
+        },
+        {
+            "title": "Invalid user identifier",
+            "payload": {
+                "dateFormat": "MM/DD/YYYY",
+                "timeFormat": "GMT",
+                "timeZone": "UTC"
+            },
+            "expected_status": 403,
+            "expected_message": "You can change only your own date/time settings"
+        },
+        {
+            "title": "Unauthorized role",
+            "payload": {
+                "dateFormat": "DD/MM/YYYY",
+                "timeFormat": "USER_LOCAL",
+                "timeZone": "Asia/Kolkata"
+            },
+            "expected_status": 401,
+            "expected_message": ""
+        },
+        {
+            "title": "User not found",
+            "payload": {
+                "dateFormat": "YYYY/MM/DD",
+                "timeFormat": "GMT",
+                "timeZone": "UTC"
+            },
+            "expected_status": 403,
+            "expected_message": "You can change only your own date/time settings"
+        }
+    ]
+}
