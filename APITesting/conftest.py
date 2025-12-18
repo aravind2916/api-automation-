@@ -115,12 +115,34 @@ def auth_token():
         
     return json.dumps(final_token)
 
+
 def pytest_html_report_title(report):
     report.title = "ThinxView API Test Dashboard"
 
 def pytest_html_results_summary(prefix, summary, postfix):
     prefix.extend([
         "<h1>ThinxView API Test Automation</h1>",
-        "<p>Detailed execution results for Password Update & Auth Tests.</p>"
+        "<p>Detailed execution results for Update Temperature Unit API.</p>"
     ])
+
+def pytest_html_results_table_header(cells):
+    cells.insert(2, "<th>Description</th>")
+    cells.insert(3, "<th>Test Data</th>")
+
+def pytest_html_results_table_row(report, cells):
+    cells.insert(2, f"<td>{getattr(report, 'description', '')}</td>")
+    cells.insert(3, f"<td>{getattr(report, 'test_data', '')}</td>")
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    report = outcome.get_result()
+    
+    # Extract test description from parameterized data
+    if hasattr(item, 'callspec'):
+        data = item.callspec.params.get('data')
+        if data:
+             report.description = data.get('testcase', 'N/A')
+             report.test_data = json.dumps(data.get('payload', {}), indent=2)
+
 
